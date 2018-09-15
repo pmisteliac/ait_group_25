@@ -1,5 +1,6 @@
 # # IN4010-12 Artifical Intelligence Techniques
 2018 Q1 Group 25:
+
 Carvalho Azevedo da Costa Maia, Rui
 ruipmaia29@gmail.com
 

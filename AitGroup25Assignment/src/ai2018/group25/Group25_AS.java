@@ -14,18 +14,21 @@ import genius.core.boaframework.OpponentModel;
 @SuppressWarnings("deprecation")
 public class Group25_AS extends AcceptanceStrategy {
 	
-	private static final Double PARAMETER1_DEFAULT_VALUE = 0.8;
-	//dummy parameter, I added this so you see how this can be used
-	private double parameter1;
+	private static final Double RESERVATION_VALUE = 0.5; // Still to adjust with tests
+	
+	private static final Double STARTS_FALLING = 0.7; // Still to adjust with tests
+	
+	private double reservation_value;
+	private double starts_falling;
 
 
 	public Group25_AS() {
 	}
 	
-	public Group25_AS(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy, double parameter1) {
+	public Group25_AS(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy, double reservation_value) {
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
-		this.parameter1 = parameter1;
+		this.reservation_value = reservation_value;
 	}
 	
 	@Override
@@ -34,21 +37,48 @@ public class Group25_AS extends AcceptanceStrategy {
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
 
-		if (parameters.get("parameter1") != null) {
-			parameter1 = parameters.get("parameter1");
+		if (parameters.get("reservation_value") != null || parameters.get("starts_falling") != null ) {
+			reservation_value = parameters.get("reservation_value");
+			starts_falling = parameters.get("starts_falling");
 		} else {
-			parameter1 = PARAMETER1_DEFAULT_VALUE;
+			reservation_value = RESERVATION_VALUE;
+			starts_falling = STARTS_FALLING;
 		}
 	}
 
 	
 	@Override
 	public Actions determineAcceptability() {
-		//TODO implement strategy here
+		// Accepting Strategy Implementation
+		
+		// Initialize variable
+		double myLastBidUtil = -1.0;
+		double right_limit = -1.0;
+		
+		// Get my last bid and the bid I am planning on doing next
+		if (negotiationSession.getOwnBidHistory().getLastBidDetails()!=null) { // Cover the first case
+			myLastBidUtil = negotiationSession.getOwnBidHistory().getLastBidDetails().getMyUndiscountedUtil();
+		}
+		
 		double myNextBidUtil = offeringStrategy.getNextBid().getMyUndiscountedUtil();
+		
+		// The Right limit is the minimum between my last and my next bid
+		if (myLastBidUtil != -1.0) {
+			right_limit = Math.min(myLastBidUtil, myNextBidUtil);
+		} else {
+			right_limit = myNextBidUtil;
+		}
+		
+		// Get, according to time, the percentage of the interval not to accept
+		double percentage_interval_rejected = what_reject(negotiationSession.getTime()); // DO THIS FUNCTION
+		
+		// Compute the decision limit
+		double decision_limit = reservation_value + percentage_interval_rejected * ( right_limit - reservation_value );
+		
+		// Get the utility of the bid the opponent made, and act accordingly
 		double lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();
 		
-		if (lastOpponentBidUtil >= myNextBidUtil * parameter1) {
+		if (lastOpponentBidUtil >= decision_limit ) {
 			return Actions.Accept;
 		}
 		return Actions.Reject;
@@ -58,8 +88,10 @@ public class Group25_AS extends AcceptanceStrategy {
 	public Set<BOAparameter> getParameterSpec() {
 
 		Set<BOAparameter> set = new HashSet<BOAparameter>();
-		set.add(new BOAparameter("parameter1", PARAMETER1_DEFAULT_VALUE ,
-				"Parameter 1 description"));
+		set.add(new BOAparameter("reservation_value", RESERVATION_VALUE ,
+				"Reservation Value, never accept offers below this value of utility"));
+		set.add(new BOAparameter("starts_falling", STARTS_FALLING ,
+				"Threshold before starting to accept bids near the reservation value"));
 		return set;
 	}
 
@@ -70,7 +102,16 @@ public class Group25_AS extends AcceptanceStrategy {
 	
 	@Override
 	public String printParameters() {
-		return "[paramter 1: " + parameter1 + " ]";
+		return "[paramter 1: " + reservation_value + " ]";
 	}
-
+	
+	private double what_reject(double normalized_time) {
+		if ( normalized_time <= starts_falling ) { 
+			return 1.0;
+		} else {
+			return ( -1/(1-starts_falling) )*normalized_time + ( 1/(1-starts_falling) ); // Still linear, transform into exponential
+		}
+	}
+	
 }
+

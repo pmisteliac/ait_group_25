@@ -14,21 +14,21 @@ import genius.core.boaframework.OpponentModel;
 @SuppressWarnings("deprecation")
 public class Group25_AS extends AcceptanceStrategy {
 	
-	private static final Double RESERVATION_VALUE = 0.5; // Still to adjust with tests
+	private static final Double RESERVATIONVALUE = 0.5; // Still to adjust with tests
 	
-	private static final Double STARTS_FALLING = 0.7; // Still to adjust with tests
+	private static final Double STARTSFALLING = 0.7; // Still to adjust with tests
 	
-	private double reservation_value;
-	private double starts_falling;
+	private double reservationValue;
+	private double startsFalling;
 
 
 	public Group25_AS() {
 	}
 	
-	public Group25_AS(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy, double reservation_value) {
+	public Group25_AS(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy, double reservationValue) {
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
-		this.reservation_value = reservation_value;
+		this.reservationValue = reservationValue;
 	}
 	
 	@Override
@@ -37,15 +37,14 @@ public class Group25_AS extends AcceptanceStrategy {
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
 
-		if (parameters.get("reservation_value") != null || parameters.get("starts_falling") != null ) {
-			reservation_value = parameters.get("reservation_value");
-			starts_falling = parameters.get("starts_falling");
+		if (parameters.get("reservationValue") != null || parameters.get("startsFalling") != null ) {
+			reservationValue = parameters.get("reservationValue");
+			startsFalling = parameters.get("startsFalling");
 		} else {
-			reservation_value = RESERVATION_VALUE;
-			starts_falling = STARTS_FALLING;
+			reservationValue = RESERVATIONVALUE;
+			startsFalling = STARTSFALLING;
 		}
 	}
-
 	
 	@Override
 	public Actions determineAcceptability() {
@@ -53,10 +52,10 @@ public class Group25_AS extends AcceptanceStrategy {
 		
 		// Initialize variable
 		double myLastBidUtil = -1.0;
-		double right_limit = -1.0;
+		double rightLimit = -1.0;
 		
 		// Get my last bid and the bid I am planning on doing next
-		if (negotiationSession.getOwnBidHistory().getLastBidDetails()!=null) { // Cover the first case
+		if (negotiationSession.getOwnBidHistory().getLastBidDetails() != null) { // Cover the first case
 			myLastBidUtil = negotiationSession.getOwnBidHistory().getLastBidDetails().getMyUndiscountedUtil();
 		}
 		
@@ -64,21 +63,21 @@ public class Group25_AS extends AcceptanceStrategy {
 		
 		// The Right limit is the minimum between my last and my next bid
 		if (myLastBidUtil != -1.0) {
-			right_limit = Math.min(myLastBidUtil, myNextBidUtil);
+			rightLimit = Math.min(myLastBidUtil, myNextBidUtil);
 		} else {
-			right_limit = myNextBidUtil;
+			rightLimit = myNextBidUtil;
 		}
 		
 		// Get, according to time, the percentage of the interval not to accept
-		double percentage_interval_rejected = what_reject(negotiationSession.getTime()); // DO THIS FUNCTION
+		double percentage_interval_rejected = what_reject(negotiationSession.getTime());
 		
 		// Compute the decision limit
-		double decision_limit = reservation_value + percentage_interval_rejected * ( right_limit - reservation_value );
+		double decisionLimit = reservationValue + percentage_interval_rejected * ( rightLimit - reservationValue );
 		
 		// Get the utility of the bid the opponent made, and act accordingly
 		double lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();
 		
-		if (lastOpponentBidUtil >= decision_limit ) {
+		if (lastOpponentBidUtil >= decisionLimit ) {
 			return Actions.Accept;
 		}
 		return Actions.Reject;
@@ -88,9 +87,9 @@ public class Group25_AS extends AcceptanceStrategy {
 	public Set<BOAparameter> getParameterSpec() {
 
 		Set<BOAparameter> set = new HashSet<BOAparameter>();
-		set.add(new BOAparameter("reservation_value", RESERVATION_VALUE ,
+		set.add(new BOAparameter("reservation_value", RESERVATIONVALUE ,
 				"Reservation Value, never accept offers below this value of utility"));
-		set.add(new BOAparameter("starts_falling", STARTS_FALLING ,
+		set.add(new BOAparameter("starts_falling", STARTSFALLING ,
 				"Threshold before starting to accept bids near the reservation value"));
 		return set;
 	}
@@ -102,14 +101,14 @@ public class Group25_AS extends AcceptanceStrategy {
 	
 	@Override
 	public String printParameters() {
-		return "[paramter 1: " + reservation_value + " ]";
+		return "[paramter 1: " + reservationValue + " ]";
 	}
 	
 	private double what_reject(double normalized_time) {
-		if ( normalized_time <= starts_falling ) { 
+		if ( normalized_time <= startsFalling ) { 
 			return 1.0;
 		} else {
-			return ( -1/(1-starts_falling) )*normalized_time + ( 1/(1-starts_falling) ); // Still linear, transform into exponential
+			return ( -1/(1-startsFalling) )*normalized_time + ( 1/(1-startsFalling) ); // Still linear, transform into exponential
 		}
 	}
 	

@@ -14,7 +14,7 @@ import genius.core.boaframework.OpponentModel;
 @SuppressWarnings("deprecation")
 public class Group25_AS extends AcceptanceStrategy {
 	
-	private static final Double RESERVATIONVALUE = 0.5; // Still to adjust with tests
+	private static final Double RESERVATIONVALUE = 0.4; // Still to adjust with tests
 	
 	private static final Double STARTSFALLING = 0.7; // Still to adjust with tests
 	
@@ -53,6 +53,7 @@ public class Group25_AS extends AcceptanceStrategy {
 		// Initialize variable
 		double myLastBidUtil = -1.0;
 		double rightLimit = -1.0;
+		double decisionLimit;
 		
 		// Get my last bid and the bid I am planning on doing next
 		if (negotiationSession.getOwnBidHistory().getLastBidDetails() != null) { // Cover the first case
@@ -68,11 +69,14 @@ public class Group25_AS extends AcceptanceStrategy {
 			rightLimit = myNextBidUtil;
 		}
 		
-		// Get, according to time, the percentage of the interval not to accept
-		double percentage_interval_rejected = what_reject(negotiationSession.getTime());
-		
-		// Compute the decision limit
-		double decisionLimit = reservationValue + percentage_interval_rejected * ( rightLimit - reservationValue );
+		if ( rightLimit <= reservationValue ) {
+			decisionLimit = reservationValue; // Error avoidance
+		} else {
+			// Get, according to time, the percentage of the interval not to accept
+			double percentage_interval_rejected = what_reject(negotiationSession.getTime());
+			// Compute the decision limit
+			decisionLimit = reservationValue + percentage_interval_rejected * ( rightLimit - reservationValue );
+		}
 		
 		// Get the utility of the bid the opponent made, and act accordingly
 		double lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();

@@ -32,8 +32,7 @@ public class Group25_AS extends AcceptanceStrategy {
 	}
 	
 	@Override
-	public void init(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy,
-			OpponentModel opponentModel, Map<String, Double> parameters) throws Exception {
+	public void init(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy, OpponentModel opponentModel, Map<String, Double> parameters) throws Exception {
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
 
@@ -48,15 +47,12 @@ public class Group25_AS extends AcceptanceStrategy {
 	
 	@Override
 	public Actions determineAcceptability() {
-		// Accepting Strategy Implementation
-		
-		// Initialize variable
 		double myLastBidUtil = -1.0;
 		double rightLimit = -1.0;
 		double decisionLimit;
 		
 		// Get my last bid and the bid I am planning on doing next
-		if (negotiationSession.getOwnBidHistory().getLastBidDetails() != null) { // Cover the first case
+		if (negotiationSession.getOwnBidHistory().getLastBidDetails() != null) {
 			myLastBidUtil = negotiationSession.getOwnBidHistory().getLastBidDetails().getMyUndiscountedUtil();
 		}
 		
@@ -68,16 +64,11 @@ public class Group25_AS extends AcceptanceStrategy {
 		} else {
 			rightLimit = myNextBidUtil;
 		}
-		
-		if ( rightLimit <= reservationValue ) {
-			decisionLimit = reservationValue; // Error avoidance
-		} else {
-			// Get, according to time, the percentage of the interval not to accept
-			double percentage_interval_rejected = what_reject(negotiationSession.getTime());
-			// Compute the decision limit
-			decisionLimit = reservationValue + percentage_interval_rejected * ( rightLimit - reservationValue );
-		}
-		
+
+		// Calculate our current lowest acceptable bid.
+		decisionLimit = reservationValue + calculateTimeDiscountFactor(negotiationSession.getTime()) * (rightLimit - reservationValue);
+		decisionLimit = Math.max(decisionLimit, reservationValue);
+
 		// Get the utility of the bid the opponent made, and act accordingly
 		double lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();
 		
@@ -108,11 +99,11 @@ public class Group25_AS extends AcceptanceStrategy {
 		return "[paramter 1: " + reservationValue + " ]";
 	}
 	
-	private double what_reject(double normalized_time) {
-		if ( normalized_time <= startsFalling ) { 
+	private double calculateTimeDiscountFactor(double normalized_time) {
+		if (normalized_time <= startsFalling) {
 			return 1.0;
 		} else {
-			return ( -1/(1-startsFalling) )*normalized_time + ( 1/(1-startsFalling) ); // Still linear, transform into exponential
+			return (-1 / (1 - startsFalling)) * normalized_time + (1 / (1 - startsFalling));
 		}
 	}
 	

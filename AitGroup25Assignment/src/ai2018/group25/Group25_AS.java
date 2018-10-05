@@ -18,18 +18,21 @@ public class Group25_AS extends AcceptanceStrategy {
 
 	private static final Double RESERVATION_VALUE_DEFAULT = 0.4; // Still to adjust with tests
 	private static final Double CONCEDE_MOMENT_DEFAULT = 0.7; // Still to adjust with tests
+	private static final Double ALWAYS_ACCEPT_VALUE = 0.85; // Still to adjust with tests
 
 	private double reservationValue;
 	private double concedeMoment;
+	private double acceptBidUtil;
 
 	public Group25_AS() {
 	}
 
 	public Group25_AS(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy,
-			double reservationValue) {
+			double reservationValue, double acceptBidUtil) {
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
 		this.reservationValue = reservationValue;
+		this.acceptBidUtil = acceptBidUtil;
 	}
 
 	@Override
@@ -39,6 +42,7 @@ public class Group25_AS extends AcceptanceStrategy {
 
 		reservationValue = getParams("reservationValue", RESERVATION_VALUE_DEFAULT, parameters);
 		concedeMoment = getParams("concedeMoment", CONCEDE_MOMENT_DEFAULT, parameters);
+		acceptBidUtil = getParams("acceptBidUtil", ALWAYS_ACCEPT_VALUE, parameters);
 	}
 
 	@Override
@@ -62,13 +66,13 @@ public class Group25_AS extends AcceptanceStrategy {
 		}
 
 		// Calculate our current lowest acceptable bid.
-		decisionLimit = reservationValue + calculateTimeDiscountFactor(negotiationSession.getTime()) * (rightLimit - reservationValue);
-		decisionLimit = Math.max(decisionLimit, reservationValue);
+		decisionLimit = reservationValue + calculateTimeDiscountFactor() * (rightLimit - reservationValue);
+		acceptBidUtil = Math.min(acceptBidUtil, Math.max(decisionLimit, reservationValue));
 
 		// Get the utility of the bid the opponent made, and act accordingly
 		double lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();
 
-		if (lastOpponentBidUtil >= decisionLimit) {
+		if (lastOpponentBidUtil >= acceptBidUtil) {
 			return Actions.Accept;
 		}
 		return Actions.Reject;
@@ -95,11 +99,12 @@ public class Group25_AS extends AcceptanceStrategy {
 		return "[reservationValue: " + reservationValue + "; concedeMoment: " + concedeMoment + " ]";
 	}
 
-	private double calculateTimeDiscountFactor(double normalized_time) {
+	private double calculateTimeDiscountFactor() {
+		double normalized_time = negotiationSession.getTime();
 		if (normalized_time <= concedeMoment) {
 			return 1.0;
 		} else {
-			return (-1 / (1 - concedeMoment)) * normalized_time + (1 / (1 - concedeMoment));
+			return Math.min(1.0, (-1 / (1 - concedeMoment)) * normalized_time + (1 / (1 - concedeMoment)));
 		}
 	}
 

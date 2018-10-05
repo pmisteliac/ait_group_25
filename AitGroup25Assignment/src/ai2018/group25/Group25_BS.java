@@ -19,7 +19,7 @@ import static ai2018.group25.Group25_Utils.getParams;
 public class Group25_BS extends OfferingStrategy {
 	
 	private static final Double UPPER_BOUND_UTILITY_DEFAULT = 1.0;
-	private static final Double LOWER_BOUND_UTILITY_DEFAULT = 0.8;
+	private static final Double LOWER_BOUND_UTILITY_DEFAULT = 0.4;
 	private static final Double CONCEDE_MOMENT_DEFAULT = 0.95;
 	
 	private double upperBoundUtility;
@@ -104,6 +104,6 @@ public class Group25_BS extends OfferingStrategy {
 	}
 
 	private double calculateTimeDiscountFactor() {
-		return (this.nextBid.getMyUndiscountedUtil() - lowerBoundUtility) / (this.negotiationSession.getTimeline().getTotalTime() - this.concedeMoment);
+		return (this.nextBid.getMyUndiscountedUtil() - lowerBoundUtility) / (this.negotiationSession.getTimeline().getTotalTime() - this.negotiationSession.getTimeline().getCurrentTime());
 	}
 }

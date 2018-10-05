@@ -18,14 +18,13 @@ import static ai2018.group25.Group25_Utils.getParams;
 @SuppressWarnings("deprecation")
 public class Group25_BS extends OfferingStrategy {
 	
-	private static final Double UPPER_BOUND_UTILITY_DEFAULT = 1.0; 
-	private static final Double LOWER_BOUND_UTILITY_DEFAULT = 0.8; 
-	private static final Double CONCEDE_MOMENT_DEFAULT = 0.9; 
+	private static final Double UPPER_BOUND_UTILITY_DEFAULT = 1.0;
+	private static final Double LOWER_BOUND_UTILITY_DEFAULT = 0.8;
+	private static final Double CONCEDE_MOMENT_DEFAULT = 0.95;
 	
 	private double upperBoundUtility;
 	private double lowerBoundUtility;
 	private double concedeMoment;
-	private double reservationValue;
 
 	public Group25_BS() {
 
@@ -39,7 +38,6 @@ public class Group25_BS extends OfferingStrategy {
 		lowerBoundUtility = getParams("lowerBoundUtility", LOWER_BOUND_UTILITY_DEFAULT, parameters);
 		concedeMoment = getParams("concedeMoment", CONCEDE_MOMENT_DEFAULT, parameters);
 		negotiationSession.setOutcomeSpace(new SortedOutcomeSpace(negotiationSession.getUtilitySpace()));
-		this.reservationValue = 0.4;// this.getParameters().get("reservationValue");
 	}
 
 
@@ -59,18 +57,15 @@ public class Group25_BS extends OfferingStrategy {
 			e.printStackTrace();
 		}
 
-		try {
-			this.nextBid = new BidDetails(bid, this.negotiationSession.getUtilitySpace().getUtility(bid));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		this.nextBid = new BidDetails(bid, this.negotiationSession.getUtilitySpace().getUtility(bid));
 
 		return this.nextBid;
 	}
 
 	/**
 	 * Determine the next Bid.
-	 * The idea is to have a hardheaded approach where we concede at the end and in the beginning we add a bit of randoms.
+	 * We use the last util and then add a random value between -0.05 and + 0.05 to the utility.
+	 * It is made sure that the bids are never lower than our reservation value and below the calculated utility.
 
 	 * @return
 	 * 	The BidDetails containing our new Bid.
@@ -79,11 +74,14 @@ public class Group25_BS extends OfferingStrategy {
 	public BidDetails determineNextBid() {
 		double u = this.nextBid.getMyUndiscountedUtil() + 0.05 - 0.1 * Math.random();
 
-		if(this.negotiationSession.getTimeline().getTime() > 0.8) {
-			u = Math.max(u - 0.2, this.reservationValue);
+		if(this.negotiationSession.getTimeline().getTime() > concedeMoment) {
+			u = Math.max(u - calculateTimeDiscountFactor(), this.lowerBoundUtility);
 		}
 
-		this.nextBid = this.negotiationSession.getOutcomeSpace().getBidNearUtility(u);
+		do {
+			this.nextBid = this.negotiationSession.getOutcomeSpace().getBidNearUtility(u);
+			u += 0.01;
+		} while (this.nextBid.getMyUndiscountedUtil() < this.lowerBoundUtility && this.nextBid.getMyUndiscountedUtil() < Math.min(u, upperBoundUtility));
 
 		return this.nextBid;
 	}
@@ -105,4 +103,7 @@ public class Group25_BS extends OfferingStrategy {
 		return "Group 25 Offering Strategy";
 	}
 
+	private double calculateTimeDiscountFactor() {
+		return (this.nextBid.getMyUndiscountedUtil() - lowerBoundUtility) / (this.negotiationSession.getTimeline().getTotalTime() - this.concedeMoment);
+	}
 }

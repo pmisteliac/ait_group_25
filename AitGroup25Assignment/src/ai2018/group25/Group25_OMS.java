@@ -12,6 +12,7 @@ import genius.core.boaframework.NegotiationSession;
 import genius.core.boaframework.OMStrategy;
 import genius.core.boaframework.OpponentModel;
 
+import static ai2018.group25.Group25_Utils.getParams;
 /**
  * This class uses an opponent model to determine the next bid for the opponent,
  * while taking the opponent's preferences into account. The opponent model is
@@ -20,12 +21,13 @@ import genius.core.boaframework.OpponentModel;
  */
 @SuppressWarnings("deprecation")
 public class Group25_OMS extends OMStrategy {
-
+	
+	private static final Double UPDATE_THRESHOLD_DEFAULT = 1.1;
 	/**
 	 * when to stop updating the opponentmodel. Note that this value is not exactly
 	 * one as a match sometimes lasts slightly longer.
 	 */
-	double updateThreshold = 1.1;
+	private double updateThreshold;
 
 	/**
 	 * Initializes the opponent model strategy. If a value for the parameter t is
@@ -39,11 +41,8 @@ public class Group25_OMS extends OMStrategy {
 	@Override
 	public void init(NegotiationSession negotiationSession, OpponentModel model, Map<String, Double> parameters) {
 		super.init(negotiationSession, model, parameters);
-		if (parameters.get("t") != null) {
-			updateThreshold = parameters.get("t").doubleValue();
-		} else {
-			System.out.println("OMStrategy assumed t = 1.1");
-		}
+		
+		updateThreshold = getParams("updateThreshold", UPDATE_THRESHOLD_DEFAULT, parameters);
 	}
 
 	/**
@@ -100,7 +99,7 @@ public class Group25_OMS extends OMStrategy {
 	@Override
 	public Set<BOAparameter> getParameterSpec() {
 		Set<BOAparameter> set = new HashSet<BOAparameter>();
-		set.add(new BOAparameter("t", 1.1, "Time after which the OM should not be updated"));
+		set.add(new BOAparameter("updateThreshold", UPDATE_THRESHOLD_DEFAULT, "Time after which the OM should not be updated"));
 		return set;
 	}
 

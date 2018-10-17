@@ -20,6 +20,8 @@ import genius.core.utility.AdditiveUtilitySpace;
 import genius.core.utility.Evaluator;
 import genius.core.utility.EvaluatorDiscrete;
 
+import static ai2018.group25.Group25_Utils.getParams;
+
 /**
  * BOA framework implementation of the HardHeaded Frequecy Model.
  * 
@@ -29,7 +31,8 @@ import genius.core.utility.EvaluatorDiscrete;
  */
 @SuppressWarnings("deprecation")
 public class Group25_OM extends OpponentModel {
-
+	
+	private static final Double LEARN_COEF_DEFAULT = 0.2;
 	/*
 	 * the learning coefficient is the weight that is added each turn to the issue
 	 * weights which changed. It's a trade-off between concession speed and
@@ -47,11 +50,7 @@ public class Group25_OM extends OpponentModel {
 	@Override
 	public void init(NegotiationSession negotiationSession, Map<String, Double> parameters) {
 		this.negotiationSession = negotiationSession;
-		if (parameters != null && parameters.get("l") != null) {
-			learnCoef = parameters.get("l");
-		} else {
-			learnCoef = 0.2;
-		}
+		learnCoef = getParams("learnCoef", LEARN_COEF_DEFAULT, parameters);
 		learnValueAddition = 1;
 		opponentUtilitySpace = (AdditiveUtilitySpace) negotiationSession.getUtilitySpace().copy();
 		amountOfIssues = opponentUtilitySpace.getDomain().getIssues().size();
@@ -141,7 +140,7 @@ public class Group25_OM extends OpponentModel {
 	@Override
 	public Set<BOAparameter> getParameterSpec() {
 		Set<BOAparameter> set = new HashSet<BOAparameter>();
-		set.add(new BOAparameter("l", 0.2,
+		set.add(new BOAparameter("learnCoef", LEARN_COEF_DEFAULT,
 				"The learning coefficient determines how quickly the issue weights are learned"));
 		return set;
 	}
@@ -152,15 +151,16 @@ public class Group25_OM extends OpponentModel {
 	private void initializeModel() {
 		double commonWeight = 1D / amountOfIssues;
 
-		for (Entry<Objective, Evaluator> e : opponentUtilitySpace.getEvaluators()) {
+		for (Entry<Objective, Evaluator> entry : opponentUtilitySpace.getEvaluators()) {
 
-			opponentUtilitySpace.unlock(e.getKey());
-			e.getValue().setWeight(commonWeight);
+			opponentUtilitySpace.unlock(entry.getKey());
+			entry.getValue().setWeight(commonWeight);
 			try {
 				// set all value weights to one (they are normalized when
 				// calculating the utility)
-				for (ValueDiscrete vd : ((IssueDiscrete) e.getKey()).getValues())
-					((EvaluatorDiscrete) e.getValue()).setEvaluation(vd, 1);
+				for (ValueDiscrete value : ((IssueDiscrete) entry.getKey()).getValues()) {
+					((EvaluatorDiscrete) entry.getValue()).setEvaluation(value, 1);
+				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

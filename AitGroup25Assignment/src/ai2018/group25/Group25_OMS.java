@@ -1,9 +1,10 @@
 package ai2018.group25;
 
+import static ai2018.group25.Group25_Utils.getParams;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import genius.core.bidding.BidDetails;
@@ -11,8 +12,6 @@ import genius.core.boaframework.BOAparameter;
 import genius.core.boaframework.NegotiationSession;
 import genius.core.boaframework.OMStrategy;
 import genius.core.boaframework.OpponentModel;
-
-import static ai2018.group25.Group25_Utils.getParams;
 /**
  * This class uses an opponent model to determine the next bid for the opponent,
  * while taking the opponent's preferences into account. The opponent model is
@@ -22,6 +21,7 @@ import static ai2018.group25.Group25_Utils.getParams;
 @SuppressWarnings("deprecation")
 public class Group25_OMS extends OMStrategy {
 	
+	//TODO might not be needed
 	private static final Double UPDATE_THRESHOLD_DEFAULT = 1.1;
 	/**
 	 * when to stop updating the opponentmodel. Note that this value is not exactly
@@ -46,7 +46,7 @@ public class Group25_OMS extends OMStrategy {
 	}
 
 	/**
-	 * Returns the best bid for the opponent given a set of similarly preferred
+	 * Returns the bid with the highest combined utility given a set of similarly preferred
 	 * bids.
 	 * 
 	 * @param list of the bids considered for offering.
@@ -59,28 +59,19 @@ public class Group25_OMS extends OMStrategy {
 		if (allBids.size() == 1) {
 			return allBids.get(0);
 		}
-		double bestUtil = -1;
+		
+		// 2. find bid with the highest combined utility
+		double highestCombinedUtility = 0;
 		BidDetails bestBid = allBids.get(0);
-
-		// 2. Check that not all bids are assigned at utility of 0
-		// to ensure that the opponent model works. If the opponent model
-		// does not work, offer a random bid.
-		boolean allWereZero = true;
-		// 3. Determine the best bid
+		
 		for (BidDetails bid : allBids) {
-			double evaluation = model.getBidEvaluation(bid.getBid());
-			if (evaluation > 0.0001) {
-				allWereZero = false;
-			}
-			if (evaluation > bestUtil) {
+			double opponentUtility = model.getBidEvaluation(bid.getBid());
+			double myUtility = bid.getMyUndiscountedUtil();
+			double combinedUtility = opponentUtility + myUtility;
+			if(combinedUtility > highestCombinedUtility) {
+				highestCombinedUtility = combinedUtility;
 				bestBid = bid;
-				bestUtil = evaluation;
 			}
-		}
-		// 4. The opponent model did not work, therefore, offer a random bid.
-		if (allWereZero) {
-			Random r = new Random();
-			return allBids.get(r.nextInt(allBids.size()));
 		}
 		return bestBid;
 	}

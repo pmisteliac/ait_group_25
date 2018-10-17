@@ -8,12 +8,14 @@ import genius.core.boaframework.OMStrategy;
 import genius.core.boaframework.OfferingStrategy;
 import genius.core.boaframework.OpponentModel;
 import genius.core.boaframework.SortedOutcomeSpace;
+import genius.core.misc.Range;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static ai2018.group25.Group25_Utils.getParams;
+import static ai2018.group25.Group25_Utils.*;
 
 @SuppressWarnings("deprecation")
 public class Group25_BS extends OfferingStrategy {
@@ -21,10 +23,16 @@ public class Group25_BS extends OfferingStrategy {
 	private static final Double UPPER_BOUND_UTILITY_DEFAULT = 1.0;
 	private static final Double LOWER_BOUND_UTILITY_DEFAULT = 0.4;
 	private static final Double CONCEDE_MOMENT_DEFAULT = 0.95;
+	private static final Double USE_OPPONENT_MODEL_MODEL_DEFAULT = 0.2;
+	private static final Double RANDOMIZATION_RANGE_DEFAULT = 0.1;
+	private static final Double CALC_OPPONENT_UTILITY_RANGE_DEFAULT = 0.1;
 	
 	private double upperBoundUtility;
 	private double lowerBoundUtility;
 	private double concedeMoment;
+	private double useOpponentModelMoment;
+	private double randomizationRange;
+	private double calcOpponentUtilityRange;
 
 	public Group25_BS() {
 
@@ -37,6 +45,9 @@ public class Group25_BS extends OfferingStrategy {
 		upperBoundUtility = getParams("upperBoundUtility", UPPER_BOUND_UTILITY_DEFAULT, parameters);
 		lowerBoundUtility = getParams("lowerBoundUtility", LOWER_BOUND_UTILITY_DEFAULT, parameters);
 		concedeMoment = getParams("concedeMoment", CONCEDE_MOMENT_DEFAULT, parameters);
+		useOpponentModelMoment = getParams("useOpponentModelMoment", USE_OPPONENT_MODEL_MODEL_DEFAULT, parameters);
+		randomizationRange = getParams("randomizationRange", RANDOMIZATION_RANGE_DEFAULT, parameters);
+		calcOpponentUtilityRange = getParams("calcOpponentUtilityRange", CALC_OPPONENT_UTILITY_RANGE_DEFAULT, parameters);
 		negotiationSession.setOutcomeSpace(new SortedOutcomeSpace(negotiationSession.getUtilitySpace()));
 	}
 
@@ -72,18 +83,32 @@ public class Group25_BS extends OfferingStrategy {
 	 */
 	@Override
 	public BidDetails determineNextBid() {
-		double u = this.nextBid.getMyUndiscountedUtil() + 0.05 - 0.1 * Math.random();
+		double targetUtility = calcualteRandomizedUtility();
 
-		if(this.negotiationSession.getTimeline().getTime() > concedeMoment) {
-			u = Math.max(u - calculateTimeDiscountFactor(), this.lowerBoundUtility);
+		double currentMoment = this.negotiationSession.getTimeline().getTime();
+		//start conceding after a defined moment in time
+		if(currentMoment > concedeMoment) {
+			targetUtility = Math.max(targetUtility - calculateTimeDiscountFactor(), this.lowerBoundUtility);
 		}
 
 		do {
-			this.nextBid = this.negotiationSession.getOutcomeSpace().getBidNearUtility(u);
-			u += 0.01;
-		} while (this.nextBid.getMyUndiscountedUtil() < this.lowerBoundUtility && this.nextBid.getMyUndiscountedUtil() < Math.min(u, upperBoundUtility));
+			if (currentMoment > useOpponentModelMoment) {
+				Range bidRange = createRange(targetUtility, calcOpponentUtilityRange);
+				List<BidDetails> bidsinRange = this.negotiationSession.getOutcomeSpace().getBidsinRange(bidRange);
+				this.nextBid = omStrategy.getBid(bidsinRange);
+			} else {
+				this.nextBid = this.negotiationSession.getOutcomeSpace().getBidNearUtility(targetUtility);
+			}
+			
+			targetUtility += 0.01;
+		} while (this.nextBid.getMyUndiscountedUtil() < this.lowerBoundUtility && this.nextBid.getMyUndiscountedUtil() < Math.min(targetUtility, upperBoundUtility));
 
 		return this.nextBid;
+	}
+
+	private double calcualteRandomizedUtility() {
+		double utilityLastBid = this.nextBid.getMyUndiscountedUtil();
+		return utilityLastBid + (randomizationRange / 2) - randomizationRange * Math.random();
 	}
 	
 	@Override
@@ -95,6 +120,12 @@ public class Group25_BS extends OfferingStrategy {
 				"Lower bound for randomisation of utility"));
 		parameterSet.add(new BOAparameter("concedeMoment", CONCEDE_MOMENT_DEFAULT ,
 				"Moment in time when the agent starts to concede"));
+		parameterSet.add(new BOAparameter("useOpponentModelMoment", USE_OPPONENT_MODEL_MODEL_DEFAULT,
+				"Moment in time when we start using the opponent model"));
+		parameterSet.add(new BOAparameter("randomizationRange", RANDOMIZATION_RANGE_DEFAULT, 
+				"Range within our randomized utility value stays"));
+		parameterSet.add(new BOAparameter("calcOpponentUtilityRange", CALC_OPPONENT_UTILITY_RANGE_DEFAULT,
+				"Range within we calculate the opponents utility to find the best bid"));
 		return parameterSet;
 	}
 	

@@ -2,6 +2,8 @@ package ai2018.group25;
 
 import java.util.Map;
 
+import genius.core.misc.Range;
+
 public final class Group25_Utils {
 
 	private Group25_Utils(){
@@ -18,5 +20,9 @@ public final class Group25_Utils {
 		}
 		
 		return defaultValue;
+	}
+	
+	public static Range createRange(double startPoint, double range) {
+		return new Range(startPoint - range / 2, startPoint + range / 2);
 	}
 }

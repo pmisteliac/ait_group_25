@@ -17,7 +17,7 @@ import genius.core.boaframework.OpponentModel;
 public class Group25_AS extends AcceptanceStrategy {
 
 	private static final Double RESERVATION_VALUE_DEFAULT = 0.4; // Still to adjust with tests
-	private static final Double CONCEDE_MOMENT_DEFAULT = 0.7; // Still to adjust with tests
+	private static final Double CONCEDE_MOMENT_DEFAULT = 0.9; // Still to adjust with tests
 	private static final Double ALWAYS_ACCEPT_VALUE = 0.85; // Still to adjust with tests
 
 	private double reservationValue;

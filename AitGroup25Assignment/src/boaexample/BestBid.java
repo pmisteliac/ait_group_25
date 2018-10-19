@@ -25,7 +25,7 @@ public class BestBid extends OMStrategy {
 	 * when to stop updating the opponentmodel. Note that this value is not
 	 * exactly one as a match sometimes lasts slightly longer.
 	 */
-	double updateThreshold = 1.1;
+	private double updateThreshold = 1.1;
 
 	/**
 	 * Initializes the opponent model strategy. If a value for the parameter t

@@ -14,13 +14,17 @@ import genius.core.utility.AdditiveUtilitySpace;
 import genius.core.utility.Evaluator;
 import genius.core.utility.EvaluatorDiscrete;
 
+import static ai2018.group25.Group25_Utils.getParams;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("deprecation")
 public class Group25_OM extends OpponentModel {
+	
+	private static final Double LEARN_COEF_DEFAULT = 0.2;
 
 	/*
 	 * the learning coefficient is the weight that is added each turn to the
@@ -39,11 +43,7 @@ public class Group25_OM extends OpponentModel {
 	@Override
 	public void init(NegotiationSession negotiationSession, Map<String, Double> parameters) {
 		this.negotiationSession = negotiationSession;
-		if (parameters != null && parameters.get("l") != null) {
-			learnCoef = parameters.get("l");
-		} else {
-			learnCoef = 0.2;
-		}
+		learnCoef = getParams("learnCoef", LEARN_COEF_DEFAULT, parameters);
 		learnValueAddition = 1;
 		opponentUtilitySpace = (AdditiveUtilitySpace) negotiationSession.getUtilitySpace().copy();
 		amountOfIssues = opponentUtilitySpace.getDomain().getIssues().size();
@@ -141,7 +141,7 @@ public class Group25_OM extends OpponentModel {
 	@Override
 	public Set<BOAparameter> getParameterSpec() {
 		Set<BOAparameter> set = new HashSet<BOAparameter>();
-		set.add(new BOAparameter("l", 0.2, "The learning coefficient determines how quickly the issue weights are learned"));
+		set.add(new BOAparameter("learnCoef", LEARN_COEF_DEFAULT, "The learning coefficient determines how quickly the issue weights are learned"));
 		return set;
 	}
 

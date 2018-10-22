@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <repository fileName="boarepository.xml">
-	<!--
-     It is needed to add this two classpaths to have in genius the bidding strategy and the acceptance condition
-      -->
 	<biddingstrategies>
 		<biddingstrategy description="Group 25 Bidding Strategy" classpath=".\bin\ai2018\group25\Group25_BS.class"/>
 	</biddingstrategies>
 	<acceptanceconditions>
 		<acceptancecondition description="Group 25 Acceptance Strategy" classpath=".\bin\ai2018\group25\Group25_AS.class"/>
 	</acceptanceconditions>
-	<!--
-      To opponent model and opponent strategy must be used one of the already existing ones, so we did not put here the path
-      -->
 	<opponentmodels>
+		<opponentmodel description = "Group 25 Opponent Model" classpath=".\bin\ai2018\group25\Group25_OM.class" />
 	</opponentmodels>
 	<omstrategies>
+		<omstrategy description = "Group 25 Opponent Model Strategy" classpath=".\bin\ai2018\group25\Group25_OMS.class" />
 	</omstrategies>
 </repository>

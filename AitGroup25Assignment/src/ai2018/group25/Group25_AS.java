@@ -13,7 +13,6 @@ import genius.core.boaframework.NegotiationSession;
 import genius.core.boaframework.OfferingStrategy;
 import genius.core.boaframework.OpponentModel;
 
-@SuppressWarnings("deprecation")
 public class Group25_AS extends AcceptanceStrategy {
 
 	private static final Double RESERVATION_VALUE_DEFAULT = 0.4; // Still to adjust with tests

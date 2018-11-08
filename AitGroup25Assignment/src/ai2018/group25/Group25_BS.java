@@ -17,7 +17,6 @@ import java.util.Set;
 
 import static ai2018.group25.Group25_Utils.*;
 
-@SuppressWarnings("deprecation")
 public class Group25_BS extends OfferingStrategy {
 	
 	private static final Double UPPER_BOUND_UTILITY_DEFAULT = 1.0;

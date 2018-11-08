@@ -18,7 +18,6 @@ import genius.core.boaframework.OpponentModel;
  * used to select the best bid.
  * 
  */
-@SuppressWarnings("deprecation")
 public class Group25_OMS extends OMStrategy {
 	
 	//TODO might not be needed

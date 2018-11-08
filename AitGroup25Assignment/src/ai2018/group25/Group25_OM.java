@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@SuppressWarnings("deprecation")
 public class Group25_OM extends OpponentModel {
 	
 	private static final Double LEARN_COEF_DEFAULT = 0.2;

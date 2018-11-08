@@ -27,7 +27,6 @@ import genius.core.utility.EvaluatorDiscrete;
  * 
  * paper: https://ii.tudelft.nl/sites/default/files/boa.pdf
  */
-@SuppressWarnings("deprecation")
 public class HardHeadedFrequencyModel extends OpponentModel {
 
 	/*

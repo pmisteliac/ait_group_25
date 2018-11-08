@@ -19,7 +19,6 @@ import genius.core.boaframework.OpponentModel;
  * T. Baarslag, K. Hindriks, M. Hendrikx, A. Dirkzwager, C.M. Jonker
  * 
  */
-@SuppressWarnings("deprecation")
 public class AC_Next extends AcceptanceStrategy {
 
 	private double a;

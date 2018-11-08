@@ -18,7 +18,6 @@ import genius.core.boaframework.OpponentModel;
  * used to select the best bid.
  * 
  */
-@SuppressWarnings("deprecation")
 public class BestBid extends OMStrategy {
 
 	/**

@@ -30,7 +30,6 @@ import genius.core.boaframework.SortedOutcomeSpace;
  * loading the domain may take some time, which may lead to the agent skipping
  * the first bid. A better implementation is GeniusTimeDependent_Offering.
  */
-@SuppressWarnings("deprecation")
 public class ConstBid extends OfferingStrategy {
 
 	/**

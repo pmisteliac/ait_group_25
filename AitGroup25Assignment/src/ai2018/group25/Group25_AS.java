@@ -26,22 +26,15 @@ public class Group25_AS extends AcceptanceStrategy {
 	public Group25_AS() {
 	}
 
-	public Group25_AS(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy,
-			double reservationValue, double acceptBidUtil) {
-		this.negotiationSession = negotiationSession;
-		this.offeringStrategy = offeringStrategy;
-		this.reservationValue = reservationValue;
-		this.acceptBidUtil = acceptBidUtil;
-	}
-
 	@Override
 	public void init(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy, OpponentModel opponentModel, Map<String, Double> parameters) throws Exception {
+		super.init(negotiationSession, offeringStrategy, opponentModel, parameters);
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
 
-		reservationValue = getParams("reservationValue", RESERVATION_VALUE_DEFAULT, parameters);
-		concedeMoment = getParams("concedeMoment", CONCEDE_MOMENT_DEFAULT, parameters);
-		acceptBidUtil = getParams("acceptBidUtil", ALWAYS_ACCEPT_VALUE, parameters);
+		reservationValue = getParams("reservation_value", RESERVATION_VALUE_DEFAULT, parameters);
+		concedeMoment = getParams("concede_moment", CONCEDE_MOMENT_DEFAULT, parameters);
+		acceptBidUtil = getParams("accept_bid_util", ALWAYS_ACCEPT_VALUE, parameters);
 	}
 
 	@Override
@@ -85,6 +78,8 @@ public class Group25_AS extends AcceptanceStrategy {
 				"Reservation Value, never accept offers below this value of utility"));
 		set.add(new BOAparameter("starts_falling", CONCEDE_MOMENT_DEFAULT,
 				"Threshold before starting to accept bids near the reservation value"));
+		set.add(new BOAparameter("accept_bid_util", ALWAYS_ACCEPT_VALUE,
+				"Threshold above we always accepts"));
 		return set;
 	}
 

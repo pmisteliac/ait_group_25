@@ -14,11 +14,11 @@ public final class Group25_Utils {
 		if(paramName == null || defaultValue == null || paramMap == null) {
 			throw new NullPointerException("One of the arguments was null.");
 		}
+
 		Double paramValue = paramMap.get(paramName);
 		if (paramValue != null) {
 			return paramValue;
 		}
-		
 		return defaultValue;
 	}
 	
@@ -26,3 +26,4 @@ public final class Group25_Utils {
 		return new Range(startPoint - range / 2, startPoint + range / 2);
 	}
 }
+

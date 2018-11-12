@@ -66,7 +66,7 @@ public class Group25_AS extends AcceptanceStrategy {
 
 		// Calculate our current lowest acceptable bid.
 		decisionLimit = reservationValue + calculateTimeDiscountFactor() * (rightLimit - reservationValue);
-		acceptBidUtil = Math.min(acceptBidUtil, Math.max(decisionLimit, reservationValue));
+		acceptBidUtil = Math.max(acceptBidUtil, Math.max(decisionLimit, reservationValue));
 
 		// Get the utility of the bid the opponent made, and act accordingly
 		double lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();

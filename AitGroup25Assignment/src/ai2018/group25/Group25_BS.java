@@ -25,12 +25,14 @@ public class Group25_BS extends OfferingStrategy {
 	private static final Double USE_OPPONENT_MODEL_MODEL_DEFAULT = 0.2;
 	private static final Double RANDOMIZATION_RANGE_DEFAULT = 0.1;
 	private static final Double CALC_OPPONENT_UTILITY_RANGE_DEFAULT = 0.1;
-	
+	private static final Double RANGE_LIMIT = 0.85;
+
 	private double upperBoundUtility;
 	private double lowerBoundUtility;
 	private double concedeMoment;
 	private double useOpponentModelMoment;
 	private double randomizationRange;
+	private double rangeLowerLimit;
 	private double calcOpponentUtilityRange;
 
 	public Group25_BS() {
@@ -47,6 +49,7 @@ public class Group25_BS extends OfferingStrategy {
 		useOpponentModelMoment = getParams("useOpponentModelMoment", USE_OPPONENT_MODEL_MODEL_DEFAULT, parameters);
 		randomizationRange = getParams("randomizationRange", RANDOMIZATION_RANGE_DEFAULT, parameters);
 		calcOpponentUtilityRange = getParams("calcOpponentUtilityRange", CALC_OPPONENT_UTILITY_RANGE_DEFAULT, parameters);
+		rangeLowerLimit = getParams("rangeLowerLimit", RANGE_LIMIT, parameters);
 		negotiationSession.setOutcomeSpace(new SortedOutcomeSpace(negotiationSession.getUtilitySpace()));
 	}
 
@@ -107,7 +110,7 @@ public class Group25_BS extends OfferingStrategy {
 
 	private double calcualteRandomizedUtility() {
 		double utilityLastBid = this.nextBid.getMyUndiscountedUtil();
-		return utilityLastBid + (randomizationRange / 2) - randomizationRange * Math.random();
+		return Math.max(utilityLastBid + (randomizationRange / 2) - randomizationRange * Math.random(), this.rangeLowerLimit);
 	}
 	
 	@Override
@@ -125,6 +128,8 @@ public class Group25_BS extends OfferingStrategy {
 				"Range within our randomized utility value stays"));
 		parameterSet.add(new BOAparameter("calcOpponentUtilityRange", CALC_OPPONENT_UTILITY_RANGE_DEFAULT,
 				"Range within we calculate the opponents utility to find the best bid"));
+		parameterSet.add(new BOAparameter("rangeLowerLimit", RANGE_LIMIT,
+				"Range within we can calculate bids"));
 		return parameterSet;
 	}
 	

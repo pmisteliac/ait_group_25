@@ -51,7 +51,6 @@ public class Group25_BS extends OfferingStrategy {
 		calcOpponentUtilityRange = getParams("calcOpponentUtilityRange", CALC_OPPONENT_UTILITY_RANGE_DEFAULT, parameters);
 		rangeLowerLimit = getParams("rangeLowerLimit", RANGE_LIMIT, parameters);
 		negotiationSession.setOutcomeSpace(new SortedOutcomeSpace(negotiationSession.getUtilitySpace()));
-		System.out.println(new Group25_Map(this.getParameters()));
 	}
 
 

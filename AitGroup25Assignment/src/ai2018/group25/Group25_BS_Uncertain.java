@@ -9,6 +9,7 @@ import genius.core.boaframework.OfferingStrategy;
 import genius.core.boaframework.OpponentModel;
 import genius.core.boaframework.SortedOutcomeSpace;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,7 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 		super.init(negotiationSession, opponentModel, omStrategy, parameters);
 		negotiationSession.setOutcomeSpace(new SortedOutcomeSpace(negotiationSession.getUtilitySpace()));
 		this.model = new Group25_OM();
+		this.model.init(this.negotiationSession, new HashMap<>());
 	}
 
 	public OpponentModel getModel() {
@@ -41,15 +43,6 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 	 */
 	@Override
 	public BidDetails determineOpeningBid() {
-//		try {
-//			Bid bid = this.negotiationSession.getUtilitySpace().getMaxUtilityBid();
-//			this.nextBid = new BidDetails(bid, this.negotiationSession.getUtilitySpace().getUtility(bid));
-//			return this.nextBid;
-//		} catch (Exception e) {
-//			//
-//		}
-
-
 		this.negotiationSession
 				.getUserModel()
 				.getBidRanking()
@@ -68,6 +61,8 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 
 		this.nextBid = new BidDetails(bid, this.model.getBidEvaluation(bid));
 
+		System.out.println(this.nextBid);
+
 		return this.nextBid;
 	}
 
@@ -75,7 +70,7 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 	 * Determine the next Bid.
 	 * We use the last util and then add a random value between -0.05 and + 0.05 to the utility.
 	 * It is made sure that the bids are never lower than our reservation value and below the calculated utility.
-
+     *
 	 * @return
 	 * 	The BidDetails containing our new Bid.
 	 */

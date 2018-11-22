@@ -3,6 +3,7 @@ package ai2018.group25;
 import genius.core.boaframework.BoaParty;
 import genius.core.boaframework.NegotiationSession;
 import genius.core.boaframework.SessionData;
+import genius.core.issue.Issue;
 import genius.core.parties.NegotiationInfo;
 import genius.core.persistent.PersistentDataType;
 import genius.core.uncertainty.AdditiveUtilitySpaceFactory;
@@ -48,6 +49,7 @@ public class Group25_Party extends BoaParty {
 		}
 
 	}
+
 
 	@Override
 	public String getDescription() {

@@ -8,11 +8,15 @@ import genius.core.boaframework.OMStrategy;
 import genius.core.boaframework.OfferingStrategy;
 import genius.core.boaframework.OpponentModel;
 import genius.core.boaframework.SortedOutcomeSpace;
+import genius.core.misc.Range;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static ai2018.group25.Group25_Utils.createRange;
 
 public class Group25_BS_Uncertain extends OfferingStrategy {
 
@@ -59,8 +63,7 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 			e.printStackTrace();
 		}
 
-//		this.nextBid = new BidDetails(bid, this.model.getBidEvaluation(bid));
-		this.nextBid = new BidDetails(bid, 0.9);
+		this.nextBid = new BidDetails(bid, this.model.getBidEvaluation(bid));
 
 		System.out.println("BID = " + this.nextBid.getBid() + "U = " + this.nextBid.getMyUndiscountedUtil());
 
@@ -79,7 +82,7 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 	public BidDetails determineNextBid() {
 		int closestBidRank = this.negotiationSession.getUserModel().getBidRanking().getClosestBidRank(this.nextBid.getBid());
 
-		Bid bid = this.negotiationSession.getUserModel().getBidRanking().getBidOrder().get(closestBidRank);
+		Bid bid = this.negotiationSession.getUserModel().getBidRanking().getBidOrder().get(closestBidRank - 1);
 
 		this.nextBid = new BidDetails(bid, this.model.getBidEvaluation(bid));
 

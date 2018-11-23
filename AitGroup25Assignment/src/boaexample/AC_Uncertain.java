@@ -21,8 +21,7 @@ public class AC_Uncertain extends AcceptanceStrategy {
 
 	@Override
 	public Actions determineAcceptability() {
-		Bid receivedBid = negotiationSession.getOpponentBidHistory()
-				.getLastBid();
+		Bid receivedBid = negotiationSession.getOpponentBidHistory().getLastBid();
 		Bid lastOwnBid = negotiationSession.getOwnBidHistory().getLastBid();
 		if (receivedBid == null || lastOwnBid == null) {
 			return Actions.Reject;
@@ -32,18 +31,15 @@ public class AC_Uncertain extends AcceptanceStrategy {
 		if (userModel != null) {
 			List<Bid> bidOrder = userModel.getBidRanking().getBidOrder();
 			if (bidOrder.contains(receivedBid)) {
-				double percentile = (bidOrder.size()
-						- bidOrder.indexOf(receivedBid))
-						/ (double) bidOrder.size();
-				if (percentile < 0.1)
+				double percentile = (bidOrder.size() - bidOrder.indexOf(receivedBid)) / (double) bidOrder.size();
+				if (percentile < 0.1) {
 					return Actions.Accept;
+				}
 			}
 		} else {
 			// we have a normal utilityspace
-			double otherLastUtil = negotiationSession.getUtilitySpace()
-					.getUtility(receivedBid);
-			double myLastUtil = negotiationSession.getUtilitySpace()
-					.getUtility(lastOwnBid);
+			double otherLastUtil = negotiationSession.getUtilitySpace().getUtility(receivedBid);
+			double myLastUtil = negotiationSession.getUtilitySpace().getUtility(lastOwnBid);
 			if (otherLastUtil >= 0.9 * myLastUtil) {
 				return Actions.Accept;
 			}

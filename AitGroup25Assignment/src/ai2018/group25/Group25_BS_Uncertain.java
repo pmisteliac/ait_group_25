@@ -30,9 +30,9 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 	@Override
 	public void init(NegotiationSession negotiationSession, OpponentModel opponentModel, OMStrategy omStrategy, Map<String, Double> parameters) throws Exception {
 		super.init(negotiationSession, opponentModel, omStrategy, parameters);
+		Group25_Utils.init(negotiationSession);
 //		negotiationSession.setOutcomeSpace(new SortedOutcomeSpace(negotiationSession.getUtilitySpace()));
-		this.model = new Group25_OM();
-		this.model.init(this.negotiationSession, new HashMap<>());
+		this.model = Group25_Utils.getModel();
 	}
 
 	public OpponentModel getModel() {
@@ -47,14 +47,6 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 	 */
 	@Override
 	public BidDetails determineOpeningBid() {
-		this.negotiationSession
-				.getUserModel()
-				.getBidRanking()
-				.getBidOrder()
-				.stream()
-				.skip((int)(0.8 * negotiationSession.getUserModel().getBidRanking().getBidOrder().size()))
-				.forEach(model::updateModel);
-
 		Bid bid = null;
 
 		try {
@@ -64,8 +56,6 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 		}
 
 		this.nextBid = new BidDetails(bid, this.model.getBidEvaluation(bid));
-
-		System.out.println("BID = " + this.nextBid.getBid() + "U = " + this.nextBid.getMyUndiscountedUtil());
 
 		return this.nextBid;
 	}

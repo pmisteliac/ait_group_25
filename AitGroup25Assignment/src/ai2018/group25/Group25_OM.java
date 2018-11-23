@@ -58,7 +58,6 @@ public class Group25_OM extends OpponentModel {
 
 	@Override
 	public void updateModel(Bid opponentBid, double time) {
-//		System.out.println(opponentBid);
 		if (negotiationSession.getOpponentBidHistory().size() < 2) {
 			return;
 		}

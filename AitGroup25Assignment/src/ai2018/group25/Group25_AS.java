@@ -2,6 +2,7 @@ package ai2018.group25;
 
 import static ai2018.group25.Group25_Utils.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ public class Group25_AS extends AcceptanceStrategy {
 		reservationValue = getParams("reservation_value", RESERVATION_VALUE_DEFAULT, parameters);
 		concedeMoment = getParams("concede_moment", CONCEDE_MOMENT_DEFAULT, parameters);
 		acceptBidUtil = getParams("accept_bid_util", ALWAYS_ACCEPT_VALUE, parameters);
+		Group25_Utils.init(negotiationSession);
 	}
 
 	@Override
@@ -46,6 +48,8 @@ public class Group25_AS extends AcceptanceStrategy {
 		// Get my last bid and the bid I am planning on doing next
 		if (negotiationSession.getOwnBidHistory().getLastBidDetails() != null) {
 			myLastBidUtil = negotiationSession.getOwnBidHistory().getLastBidDetails().getMyUndiscountedUtil();
+		} else {
+			return Actions.Reject;
 		}
 
 		double myNextBidUtil = offeringStrategy.getNextBid().getMyUndiscountedUtil();
@@ -61,8 +65,9 @@ public class Group25_AS extends AcceptanceStrategy {
 		decisionLimit = reservationValue + calculateTimeDiscountFactor() * (rightLimit - reservationValue);
 		double acceptBidUtil = Math.min(this.acceptBidUtil, Math.max(decisionLimit, reservationValue));
 
-		// Get the utility of the bid the opponent made, and act accordingly
-		double lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();
+		double lastOpponentBidUtil = Group25_Utils.getModel().getBidEvaluation(
+				this.negotiationSession.getOpponentBidHistory().getLastBidDetails().getBid()
+		);
 
 		if (lastOpponentBidUtil >= acceptBidUtil) {
 			return Actions.Accept;

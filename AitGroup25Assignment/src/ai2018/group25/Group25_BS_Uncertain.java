@@ -31,7 +31,7 @@ public class Group25_BS_Uncertain extends OfferingStrategy {
 	public void init(NegotiationSession negotiationSession, OpponentModel opponentModel, OMStrategy omStrategy, Map<String, Double> parameters) throws Exception {
 		super.init(negotiationSession, opponentModel, omStrategy, parameters);
 		Group25_Utils.init(negotiationSession);
-//		negotiationSession.setOutcomeSpace(new SortedOutcomeSpace(negotiationSession.getUtilitySpace()));
+		negotiationSession.setOutcomeSpace(new SortedOutcomeSpace(negotiationSession.getUtilitySpace()));
 		this.model = Group25_Utils.getModel();
 	}
 

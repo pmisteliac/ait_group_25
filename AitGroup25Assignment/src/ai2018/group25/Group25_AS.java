@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import genius.core.Bid;
 import genius.core.boaframework.AcceptanceStrategy;
 import genius.core.boaframework.Actions;
 import genius.core.boaframework.BOAparameter;
@@ -37,6 +38,9 @@ public class Group25_AS extends AcceptanceStrategy {
 		concedeMoment = getParams("concede_moment", CONCEDE_MOMENT_DEFAULT, parameters);
 		acceptBidUtil = getParams("accept_bid_util", ALWAYS_ACCEPT_VALUE, parameters);
 		Group25_Utils.init(negotiationSession);
+		Bid bid = negotiationSession.getUserModel().getBidRanking().getMmaximalBid();
+		reservationValue = reservationValue * Group25_Utils.getModel().getBidEvaluation(bid);
+		acceptBidUtil = acceptBidUtil * Group25_Utils.getModel().getBidEvaluation(bid);
 	}
 
 	@Override

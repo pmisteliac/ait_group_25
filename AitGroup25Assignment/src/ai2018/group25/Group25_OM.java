@@ -38,14 +38,21 @@ public class Group25_OM extends OpponentModel {
 	private int learnValueAddition;
 	private int amountOfIssues;
 	private double goldenValue;
+	private boolean uncertain;
 
 	@Override
 	public void init(NegotiationSession negotiationSession, Map<String, Double> parameters) {
 		this.negotiationSession = negotiationSession;
 		learnCoef = getParams("learnCoef", LEARN_COEF_DEFAULT, parameters);
 		learnValueAddition = 1;
-		opponentUtilitySpace = new AdditiveUtilitySpace(this.negotiationSession.getUserModel().getDomain());
-		amountOfIssues = negotiationSession.getUserModel().getDomain().getIssues().size();
+		uncertain = this.negotiationSession.getUserModel() != null;
+		if (uncertain) {
+			opponentUtilitySpace = new AdditiveUtilitySpace(this.negotiationSession.getUserModel().getDomain());
+			amountOfIssues = negotiationSession.getUserModel().getDomain().getIssues().size();
+		} else {
+			opponentUtilitySpace = (AdditiveUtilitySpace) negotiationSession.getUtilitySpace().copy();
+			amountOfIssues = opponentUtilitySpace.getDomain().getIssues().size();
+		}
 		/*
 		 * This is the value to be added to weights of unchanged issues before
 		 * normalization. Also the value that is taken as the minimum possible
@@ -125,7 +132,11 @@ public class Group25_OM extends OpponentModel {
 	public double getBidEvaluation(Bid bid) {
 		double result = 0;
 		try {
-			result = (double) this.negotiationSession.getUserModel().getBidRanking().getClosestBidRank(bid);
+			if (uncertain) {
+				result = (double) this.negotiationSession.getUserModel().getBidRanking().getClosestBidRank(bid);
+			} else {
+				result = opponentUtilitySpace.getUtility(bid);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

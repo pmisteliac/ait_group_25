@@ -48,7 +48,7 @@ public class Group25_OMS extends OMStrategy {
 	 * Returns the bid with the highest combined utility given a set of similarly preferred
 	 * bids.
 	 * 
-	 * @param list of the bids considered for offering.
+	 * @param allBids list of the bids considered for offering.
 	 * @return bid to be offered to opponent.
 	 */
 	@Override

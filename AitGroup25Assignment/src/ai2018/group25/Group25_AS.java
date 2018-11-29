@@ -2,10 +2,12 @@ package ai2018.group25;
 
 import static ai2018.group25.Group25_Utils.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import genius.core.Bid;
 import genius.core.boaframework.AcceptanceStrategy;
 import genius.core.boaframework.Actions;
 import genius.core.boaframework.BOAparameter;
@@ -22,6 +24,7 @@ public class Group25_AS extends AcceptanceStrategy {
 	private double reservationValue;
 	private double concedeMoment;
 	private double acceptBidUtil;
+	private boolean uncertain;
 
 	public Group25_AS() {
 	}
@@ -35,6 +38,13 @@ public class Group25_AS extends AcceptanceStrategy {
 		reservationValue = getParams("reservation_value", RESERVATION_VALUE_DEFAULT, parameters);
 		concedeMoment = getParams("concede_moment", CONCEDE_MOMENT_DEFAULT, parameters);
 		acceptBidUtil = getParams("accept_bid_util", ALWAYS_ACCEPT_VALUE, parameters);
+		uncertain = this.negotiationSession.getUserModel() != null;
+		if (uncertain) {
+			Group25_Utils.init(negotiationSession);
+			Bid bid = negotiationSession.getUserModel().getBidRanking().getMmaximalBid();
+			reservationValue = reservationValue * Group25_Utils.getModel().getBidEvaluation(bid);
+			acceptBidUtil = acceptBidUtil * Group25_Utils.getModel().getBidEvaluation(bid);
+		}
 	}
 
 	@Override
@@ -46,6 +56,8 @@ public class Group25_AS extends AcceptanceStrategy {
 		// Get my last bid and the bid I am planning on doing next
 		if (negotiationSession.getOwnBidHistory().getLastBidDetails() != null) {
 			myLastBidUtil = negotiationSession.getOwnBidHistory().getLastBidDetails().getMyUndiscountedUtil();
+		} else if (uncertain) {
+			return Actions.Reject;
 		}
 
 		double myNextBidUtil = offeringStrategy.getNextBid().getMyUndiscountedUtil();
@@ -61,8 +73,14 @@ public class Group25_AS extends AcceptanceStrategy {
 		decisionLimit = reservationValue + calculateTimeDiscountFactor() * (rightLimit - reservationValue);
 		double acceptBidUtil = Math.min(this.acceptBidUtil, Math.max(decisionLimit, reservationValue));
 
-		// Get the utility of the bid the opponent made, and act accordingly
-		double lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();
+		double lastOpponentBidUtil;
+		if (uncertain) {
+			lastOpponentBidUtil = Group25_Utils.getModel().getBidEvaluation(
+					this.negotiationSession.getOpponentBidHistory().getLastBidDetails().getBid()
+			);
+		} else {
+			lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();
+		}
 
 		if (lastOpponentBidUtil >= acceptBidUtil) {
 			return Actions.Accept;

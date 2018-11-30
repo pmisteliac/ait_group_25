@@ -1,5 +1,12 @@
 package ai2018.group25;
 
+import static ai2018.group25.Group25_Utils.getParams;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
 import genius.core.Bid;
 import genius.core.bidding.BidDetails;
 import genius.core.boaframework.BOAparameter;
@@ -8,17 +15,6 @@ import genius.core.boaframework.OMStrategy;
 import genius.core.boaframework.OfferingStrategy;
 import genius.core.boaframework.OpponentModel;
 import genius.core.boaframework.SortedOutcomeSpace;
-import genius.core.misc.Range;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import static ai2018.group25.Group25_Utils.createRange;
-import static ai2018.group25.Group25_Utils.getParams;
 
 public class Group25_BS_Uncertain extends OfferingStrategy {
 

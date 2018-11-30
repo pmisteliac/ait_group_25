@@ -1,4 +1,4 @@
-package uncertaintyexample;
+package boaexample;
 
 import java.util.List;
 
@@ -12,6 +12,8 @@ import genius.core.uncertainty.ExperimentalUserModel;
 import genius.core.utility.AbstractUtilitySpace;
 
 public class UncertaintyAgentExample extends AbstractNegotiationParty {
+
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public Action chooseAction(List<Class<? extends Action>> possibleActions) {

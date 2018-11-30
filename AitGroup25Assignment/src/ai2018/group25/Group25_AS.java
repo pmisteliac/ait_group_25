@@ -16,9 +16,9 @@ import genius.core.boaframework.OpponentModel;
 
 public class Group25_AS extends AcceptanceStrategy {
 
-	private static final Double RESERVATION_VALUE_DEFAULT = 0.4; // Still to adjust with tests
-	private static final Double CONCEDE_MOMENT_DEFAULT = 0.9; // Still to adjust with tests
-	private static final Double ALWAYS_ACCEPT_VALUE = 0.85; // Still to adjust with tests
+	private static final Double RESERVATION_VALUE_DEFAULT = 0.4;
+	private static final Double CONCEDE_MOMENT_DEFAULT = 0.9;
+	private static final Double ALWAYS_ACCEPT_VALUE = 0.85;
 
 	private double reservationValue;
 	private double concedeMoment;
@@ -29,7 +29,8 @@ public class Group25_AS extends AcceptanceStrategy {
 	}
 
 	@Override
-	public void init(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy, OpponentModel opponentModel, Map<String, Double> parameters) throws Exception {
+	public void init(NegotiationSession negotiationSession, OfferingStrategy offeringStrategy,
+			OpponentModel opponentModel, Map<String, Double> parameters) throws Exception {
 		super.init(negotiationSession, offeringStrategy, opponentModel, parameters);
 		this.negotiationSession = negotiationSession;
 		this.offeringStrategy = offeringStrategy;
@@ -74,11 +75,11 @@ public class Group25_AS extends AcceptanceStrategy {
 
 		double lastOpponentBidUtil;
 		if (uncertain) {
-			lastOpponentBidUtil = Group25_Utils.getModel().getBidEvaluation(
-					this.negotiationSession.getOpponentBidHistory().getLastBidDetails().getBid()
-			);
+			lastOpponentBidUtil = Group25_Utils.getModel()
+					.getBidEvaluation(this.negotiationSession.getOpponentBidHistory().getLastBidDetails().getBid());
 		} else {
-			lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails().getMyUndiscountedUtil();
+			lastOpponentBidUtil = negotiationSession.getOpponentBidHistory().getLastBidDetails()
+					.getMyUndiscountedUtil();
 		}
 
 		if (lastOpponentBidUtil >= acceptBidUtil) {
@@ -95,8 +96,7 @@ public class Group25_AS extends AcceptanceStrategy {
 				"Reservation Value, never accept offers below this value of utility"));
 		set.add(new BOAparameter("starts_falling", CONCEDE_MOMENT_DEFAULT,
 				"Threshold before starting to accept bids near the reservation value"));
-		set.add(new BOAparameter("accept_bid_util", ALWAYS_ACCEPT_VALUE,
-				"Threshold above we always accepts"));
+		set.add(new BOAparameter("accept_bid_util", ALWAYS_ACCEPT_VALUE, "Threshold above we always accepts"));
 		return set;
 	}
 
@@ -107,7 +107,8 @@ public class Group25_AS extends AcceptanceStrategy {
 
 	@Override
 	public String printParameters() {
-		return "[reservationValue: " + reservationValue + "; concedeMoment: " + concedeMoment + " ]";
+		return "[reservationValue: " + reservationValue + "; concedeMoment: " + concedeMoment + "; acceptBidUtil: "
+				+ acceptBidUtil + " ]";
 	}
 
 	private double calculateTimeDiscountFactor() {

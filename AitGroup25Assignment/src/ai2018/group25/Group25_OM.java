@@ -22,18 +22,18 @@ import java.util.Map;
 import java.util.Set;
 
 public class Group25_OM extends OpponentModel {
-	
+
 	private static final Double LEARN_COEF_DEFAULT = 0.2;
 
 	/*
-	 * the learning coefficient is the weight that is added each turn to the
-	 * issue weights which changed. It's a trade-off between concession speed
-	 * and accuracy.
+	 * the learning coefficient is the weight that is added each turn to the issue
+	 * weights which changed. It's a trade-off between concession speed and
+	 * accuracy.
 	 */
 	private double learnCoef;
 	/*
-	 * value which is added to a value if it is found. Determines how fast the
-	 * value weights converge.
+	 * value which is added to a value if it is found. Determines how fast the value
+	 * weights converge.
 	 */
 	private int learnValueAddition;
 	private int amountOfIssues;
@@ -55,8 +55,8 @@ public class Group25_OM extends OpponentModel {
 		}
 		/*
 		 * This is the value to be added to weights of unchanged issues before
-		 * normalization. Also the value that is taken as the minimum possible
-		 * weight, (therefore defining the maximum possible also).
+		 * normalization. Also the value that is taken as the minimum possible weight,
+		 * (therefore defining the maximum possible also).
 		 */
 		goldenValue = learnCoef / amountOfIssues;
 
@@ -69,11 +69,9 @@ public class Group25_OM extends OpponentModel {
 			return;
 		}
 		int numberOfUnchanged = 0;
-		BidDetails oppBid = negotiationSession.getOpponentBidHistory()
-				.getHistory()
+		BidDetails oppBid = negotiationSession.getOpponentBidHistory().getHistory()
 				.get(negotiationSession.getOpponentBidHistory().size() - 1);
-		BidDetails prevOppBid = negotiationSession.getOpponentBidHistory()
-				.getHistory()
+		BidDetails prevOppBid = negotiationSession.getOpponentBidHistory().getHistory()
 				.get(negotiationSession.getOpponentBidHistory().size() - 2);
 		HashMap<Integer, Integer> lastDiffSet = determineDifference(prevOppBid, oppBid);
 
@@ -109,16 +107,16 @@ public class Group25_OM extends OpponentModel {
 				EvaluatorDiscrete value = (EvaluatorDiscrete) e.getValue();
 				IssueDiscrete issue = ((IssueDiscrete) e.getKey());
 				/*
-				 * add constant learnValueAddition to the current preference of
-				 * the value to make it more important
+				 * add constant learnValueAddition to the current preference of the value to
+				 * make it more important
 				 */
 				ValueDiscrete issuevalue = (ValueDiscrete) oppBid.getBid().getValue(issue.getNumber());
-				ValueDiscrete prevIssueValue  = (ValueDiscrete) prevOppBid.getBid().getValue(issue.getNumber());
+				ValueDiscrete prevIssueValue = (ValueDiscrete) prevOppBid.getBid().getValue(issue.getNumber());
 
 				Integer eval = learnValueAddition + value.getEvaluationNotNormalized(issuevalue);
 
 				if (issuevalue == prevIssueValue) {
-					eval = Math.max(eval, 8 * value.getEvaluationNotNormalized(prevIssueValue ) / 10);
+					eval = Math.max(eval, 8 * value.getEvaluationNotNormalized(prevIssueValue) / 10);
 				}
 
 				value.setEvaluation(issuevalue, eval);
@@ -151,7 +149,8 @@ public class Group25_OM extends OpponentModel {
 	@Override
 	public Set<BOAparameter> getParameterSpec() {
 		Set<BOAparameter> set = new HashSet<BOAparameter>();
-		set.add(new BOAparameter("learnCoef", LEARN_COEF_DEFAULT, "The learning coefficient determines how quickly the issue weights are learned"));
+		set.add(new BOAparameter("learnCoef", LEARN_COEF_DEFAULT,
+				"The learning coefficient determines how quickly the issue weights are learned"));
 		return set;
 	}
 
@@ -166,7 +165,8 @@ public class Group25_OM extends OpponentModel {
 			opponentUtilitySpace.unlock(e.getKey());
 			e.getValue().setWeight(commonWeight);
 			try {
-				// set all value weights to one (they are normalized when calculating the utility)
+				// set all value weights to one (they are normalized when calculating the
+				// utility)
 				for (ValueDiscrete vd : ((IssueDiscrete) e.getKey()).getValues()) {
 					((EvaluatorDiscrete) e.getValue()).setEvaluation(vd, 1);
 				}
@@ -177,14 +177,12 @@ public class Group25_OM extends OpponentModel {
 	}
 
 	/**
-	 * Determines the difference between bids. For each issue, it is determined
-	 * if the value changed. If this is the case, a 1 is stored in a hashmap for
-	 * that issue, else a 0.
+	 * Determines the difference between bids. For each issue, it is determined if
+	 * the value changed. If this is the case, a 1 is stored in a hashmap for that
+	 * issue, else a 0.
 	 *
-	 * @param first
-	 *            bid of the opponent
-	 * @param second
-	 *            bid
+	 * @param first  bid of the opponent
+	 * @param second bid
 	 * @return
 	 */
 	private HashMap<Integer, Integer> determineDifference(BidDetails first, BidDetails second) {

@@ -11,12 +11,12 @@ public final class Group25_Utils {
 
 	private static OpponentModel model;
 
-	private Group25_Utils(){
-		
+	private Group25_Utils() {
+
 	}
-	
+
 	public static Double getParams(String paramName, Double defaultValue, Map<String, Double> paramMap) {
-		if(paramName == null || defaultValue == null || paramMap == null) {
+		if (paramName == null || defaultValue == null || paramMap == null) {
 			throw new NullPointerException("One of the arguments was null.");
 		}
 
@@ -26,7 +26,7 @@ public final class Group25_Utils {
 		}
 		return defaultValue;
 	}
-	
+
 	public static Range createRange(double startPoint, double range) {
 		return new Range(startPoint - range / 2, startPoint + range / 2);
 	}
@@ -37,18 +37,12 @@ public final class Group25_Utils {
 		}
 		model = new Group25_OM();
 		model.init(negotiationSession, new HashMap<>());
-		negotiationSession
-				.getUserModel()
-				.getBidRanking()
-				.getBidOrder()
-				.stream()
-				.skip((int)(0.8 * negotiationSession.getUserModel().getBidRanking().getBidOrder().size()))
+		negotiationSession.getUserModel().getBidRanking().getBidOrder().stream()
+				.skip((int) (0.8 * negotiationSession.getUserModel().getBidRanking().getBidOrder().size()))
 				.forEach(model::updateModel);
 	}
 
-	public static OpponentModel getModel()
-	{
+	public static OpponentModel getModel() {
 		return model;
 	}
 }
-

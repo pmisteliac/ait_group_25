@@ -143,7 +143,7 @@ public class Group25_OM extends OpponentModel {
 
 	@Override
 	public String getName() {
-		return "HardHeaded Frequency Model group 25";
+		return "Group 25 Opponent Model";
 	}
 
 	@Override

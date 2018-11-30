@@ -51,7 +51,7 @@ public class Group25_BS extends OfferingStrategy {
 		if (uncertain) {
 			lowerBoundUtility = getParams("lowerBoundUtility", LOWER_BOUND_UTILITY_DEFAULT, parameters);
 			concedeMoment = getParams("concedeMoment", CONCEDE_MOMENT_DEFAULT, parameters);
-			randomizationRange = getParams("randomizationRange", RANDOMIZATION_COUNT_DEFAULT, parameters);
+			randomizationRange = getParams("randomizationCount", RANDOMIZATION_COUNT_DEFAULT, parameters);
 			rangeLowerLimit = getParams("rangeLowerLimit", RANGE_LIMIT, parameters);
 			rangeLowerLimit *= this.negotiationSession.getUserModel().getBidRanking().getSize();
 			Group25_Utils.init(negotiationSession);
@@ -183,6 +183,8 @@ public class Group25_BS extends OfferingStrategy {
 		parameterSet.add(new BOAparameter("calcOpponentUtilityRange", CALC_OPPONENT_UTILITY_RANGE_DEFAULT,
 				"Range within we calculate the opponents utility to find the best bid"));
 		parameterSet.add(new BOAparameter("rangeLowerLimit", RANGE_LIMIT, "Range within we can calculate bids"));
+		parameterSet.add(new BOAparameter("randomizationCount", RANDOMIZATION_COUNT_DEFAULT, "Range within for new bids"));
+
 		return parameterSet;
 	}
 

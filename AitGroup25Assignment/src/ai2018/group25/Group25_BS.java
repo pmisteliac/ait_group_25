@@ -121,7 +121,7 @@ public class Group25_BS extends OfferingStrategy {
 			if (closestBidRank >= this.negotiationSession.getUserModel().getBidRanking().getSize()) {
 				closestBidRank = this.negotiationSession.getUserModel().getBidRanking().getSize() - 1;
 			} else if (closestBidRank < rangeLowerLimit) {
-				closestBidRank = (int) rangeLowerLimit;
+				closestBidRank = (int) rangeLowerLimit - 2;
 			}
 
 			double currentMoment = this.negotiationSession.getTimeline().getTime();
@@ -131,7 +131,23 @@ public class Group25_BS extends OfferingStrategy {
 						* this.negotiationSession.getUserModel().getBidRanking().getSize();
 			}
 
-			Bid bid = this.negotiationSession.getUserModel().getBidRanking().getBidOrder().get(closestBidRank - 1);
+			Bid bid = null;
+			double val = -1.0;
+
+
+			if (currentMoment > useOpponentModelMoment) {
+				for (int i = -1; i < 2; i++) {
+					Bid testBid = this.negotiationSession.getUserModel().getBidRanking().getBidOrder().get(closestBidRank - 1 + i);
+					double testVal = this.model.getBidEvaluation(testBid) + this.opponentModel.getBidEvaluation(testBid);
+					if (testVal > val) {
+						bid = testBid;
+						val = testVal;
+					}
+				}
+			} else {
+				bid = this.negotiationSession.getUserModel().getBidRanking().getBidOrder().get(closestBidRank - 1);
+			}
+
 
 			this.nextBid = new BidDetails(bid, this.model.getBidEvaluation(bid));
 

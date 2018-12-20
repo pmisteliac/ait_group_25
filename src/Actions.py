@@ -3,29 +3,52 @@ class Actions(object):
     selfish = 0
     nice = 0
     unfortunated = 0
+    fortunated = 0
     silent = 0
 
-    delta = 0
+    delta = 0.001
 
     def update(self, currentAgentDelta: float, oppenementDelta: float) -> None:
-        print('A', currentAgentDelta)
-        print('O', oppenementDelta)
-        if currentAgentDelta > self.delta and oppenementDelta > self.delta:
-            self.nice += 1
-        elif currentAgentDelta > self.delta and -self.delta <= oppenementDelta <= 0:
-            self.selfish += 1
-        elif -self.delta <= currentAgentDelta <= 0 and oppenementDelta > self.delta:
-            self.conceded += 1
-        elif -self.delta <= currentAgentDelta <= 0 and -self.delta <= oppenementDelta <= 0:
+        """
+        Several actions can be taken by the agents:
+            - Silent: Changes to the utilty are with in the abs(delta) < self.delta
+
+            - Nice: Own utilty increase oppement doesn't change.
+            - Fortunated: Own utilty increases and the oppement one too.
+            - Selfish: Own utilty increases and opppement decreases.
+
+            - Conceding: Own utilty decreases and the oppement one improves.
+            - Unfortunated: Own utilty decreases and the oppenemt one too.
+
+        :param float currentAgentDelta:
+        :param float oppenementDelta:
+        :return:
+        """
+
+        if abs(currentAgentDelta) < self.delta and abs(oppenementDelta) < self.delta:
+            self.silent += 1
+            return
+
+        if currentAgentDelta >= 0:
+            if oppenementDelta > self.delta:
+                self.fortunated += 1
+            elif abs(oppenementDelta) < self.delta:
+                self.nice += 1
+            else:
+                self.selfish += 1
+            return
+
+        if oppenementDelta < 0:
             self.unfortunated += 1
         else:
-            self.silent += 1
+            self.conceded += 1
 
     def __str__(self):
-        return 'Conceded = {0}, selfish = {1}, nice = {2}, unfortunated = {3}, silent = {4}\n'.format(
+        return 'Conceded = {0}, selfish = {1}, nice = {2}, fortunate = {3}, unfortunated = {4}, silent = {5}\n'.format(
             self.conceded,
             self.selfish,
             self.nice,
+            self.fortunated,
             self.unfortunated,
             self.silent
         )

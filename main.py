@@ -6,15 +6,15 @@ import os
 
 from src.Agent import Agent
 
-if (len(sys.argv) == 2):
+if len(sys.argv) == 2:
     src = str(sys.argv[1])
 else:
-    src = 'data/'
+    src = 'data'
 
 for root, dirs, files in os.walk(src, topdown=True):
     for name in files:
         print('running:', name)
-        with open(src + name) as file:
+        with open(os.path.join(src, name)) as file:
             run = json.load(file)
             agent1 = Agent(list(run['issues'].keys()), run['Utility1'])
             agent2 = Agent(list(run['issues'].keys()), run['Utility2'])

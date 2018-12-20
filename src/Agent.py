@@ -9,6 +9,7 @@ class Agent(object):
     lastBid = 0.0
     currentBid = 0.0
     actions = {}
+    oppementUtilty = -1
 
     def __init__(self, issues: Vector, weights):
         self.domain = Domain(issues, weights)
@@ -22,13 +23,14 @@ class Agent(object):
         self.lastBid = self.currentBid
         self.currentBid = self.getUtilty(bid)
 
-    def updateAction(self, oppementUtiltyChange: float) -> None:
+    def updateAction(self, oppementUtilty: float) -> None:
         """
         After a round has be done calculate which actions have been made by the agent.
-        :param float oppementUtiltyChange:
+        :param float oppementUtilty:
         """
-        if self.lastBid > 0:
-            self.actions.update(self.currentBid - self.lastBid, oppementUtiltyChange)
+        if self.lastBid > 0 and self.oppementUtilty > -1:
+            self.actions.update(self.currentBid - self.lastBid, oppementUtilty - self.oppementUtilty)
+        self.oppementUtilty = oppementUtilty
 
     def getUtilty(self, bid: str) -> float:
         """

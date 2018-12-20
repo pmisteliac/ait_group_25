@@ -23,3 +23,6 @@ with open(fileName) as file:
             agent2.updateAction(agent1.getUtilty(bid['agent2']))
         if 'accept' in bid:
             break
+
+    print(str(agent1.actions))
+    print(str(agent2.actions))

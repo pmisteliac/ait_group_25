@@ -45,12 +45,7 @@ class Actions(object):
 
     def __str__(self):
         return 'Conceded = {0}, selfish = {1}, nice = {2}, fortunate = {3}, unfortunated = {4}, silent = {5}\n'.format(
-            self.conceded,
-            self.selfish,
-            self.nice,
-            self.fortunated,
-            self.unfortunated,
-            self.silent
+            *map(lambda x: x[1], self)
         )
 
     def __iter__(self):

@@ -37,12 +37,8 @@ class Data(object):
     silent = 0
 
     def __init__(self, action: Actions):
-s        self.conceded = action.conceded
-        self.selfish = action.selfish
-        self.nice = action.nice
-        self.unfortunated = action.unfortunated
-        self.fortunated = action.fortunated
-        self.silent = action.silent
+        for i in action:
+            setattr(self, i[0], i[1])
 
     def __iadd__(self, other):
         return self.save(map(lambda o: {o[0][0]: o[0][1] + o[1][1]}, zip(self, other)))
@@ -76,10 +72,5 @@ s        self.conceded = action.conceded
 
     def __str__(self):
         return 'Conceded = {0}, selfish = {1}, nice = {2}, fortunate = {3}, unfortunated = {4}, silent = {5}\n'.format(
-            self.conceded,
-            self.selfish,
-            self.nice,
-            self.fortunated,
-            self.unfortunated,
-            self.silent
+            *map(lambda x: x[1], self)
         )

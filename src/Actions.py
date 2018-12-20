@@ -52,3 +52,11 @@ class Actions(object):
             self.unfortunated,
             self.silent
         )
+
+    def __iter__(self):
+        yield 'conceded', self.conceded
+        yield 'selfish', self.selfish
+        yield 'nice', self.nice
+        yield 'fortunated', self.fortunated
+        yield 'unfortunated', self.unfortunated
+        yield 'silent', self.silent

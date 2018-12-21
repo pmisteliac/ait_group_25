@@ -53,5 +53,5 @@ for root, dirs, files in os.walk(src, topdown=True):
                     agent2.updateAction(agent1.getUtilty(bid['agent2']))
                 if 'accept' in bid:
                     for i in markov.getChances(agent1.actions, agent2.actions):
-                        print('AAA: ', list(i.keys())[0], i.get(list(i.keys())[0]))
+                        print('AAA: ', *i, i.get(*i))
                     break

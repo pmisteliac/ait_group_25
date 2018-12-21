@@ -1,6 +1,7 @@
 from functools import reduce
 
 import copy
+import operator
 
 from src.Actions import Actions
 from inflection import camelize
@@ -38,10 +39,10 @@ class Data(object):
 
     def __init__(self, action: Actions):
         for i in action:
-            setattr(self, i[0], i[1])
+            setattr(self, *i)
 
     def __iadd__(self, other):
-        return self.save(map(lambda o: {o[0][0]: o[0][1] + o[1][1]}, zip(self, other)))
+        return self.calc(other, operator.add)
 
     def getChance(self, action: Actions):
         count = reduce(lambda x, y: x + y[1], self, 0)
@@ -49,28 +50,25 @@ class Data(object):
         return (self / action) * (countActions / count)
 
     def __iter__(self):
-        yield 'conceded', self.conceded
-        yield 'selfish', self.selfish
-        yield 'nice', self.nice
-        yield 'fortunated', self.fortunated
-        yield 'unfortunated', self.unfortunated
-        yield 'silent', self.silent
+        for i in self.__dict__:
+            yield i, getattr(self, i)
 
     def __truediv__(self, other):
         return self.save(map(lambda o: {o[0][0]: 0 if o[1][1] == 0 else o[0][1] / o[1][1]}, zip(self, other)))
 
     def __mul__(self, other):
+        return self.calc(other, operator.mul)
+
+    def calc(self, other, operator):
         if isinstance(other, float) or isinstance(other, int):
-            return self.save(map(lambda x: {x[0]: x[1] * other}, self))
+            return self.save(map(lambda x: {x[0]: operator(x[1], other)}, self))
         else:
-            return self.save(map(lambda o: {o[0][0]: o[0][1] * o[1][1]}, zip(self, other)))
+            return self.save(map(lambda o: {o[0][0]: operator(o[0][1], o[1][1])}, zip(self, other)))
 
     def save(self, itter):
         for i in list(itter):
-            setattr(self, list(i.keys())[0], i.get(list(i.keys())[0]))
+            setattr(self, *i, i.get(*i))
         return self
 
     def __str__(self):
-        return 'Conceded = {0}, selfish = {1}, nice = {2}, fortunate = {3}, unfortunated = {4}, silent = {5}\n'.format(
-            *map(lambda x: x[1], self)
-        )
+        return ''.join(map(lambda x: '{0} = {1}, '.format(*x), self)).rstrip(', ') + '\n'

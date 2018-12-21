@@ -44,9 +44,7 @@ class Actions(object):
             self.conceded += 1
 
     def __str__(self):
-        return 'Conceded = {0}, selfish = {1}, nice = {2}, fortunate = {3}, unfortunated = {4}, silent = {5}\n'.format(
-            *map(lambda x: x[1], self)
-        )
+        return ''.join(map(lambda x: '{0} = {1}, '.format(*x), self)).rstrip(', ') + '\n'
 
     def __iter__(self):
         yield 'conceded', self.conceded

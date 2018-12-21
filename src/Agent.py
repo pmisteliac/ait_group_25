@@ -32,6 +32,9 @@ class Agent(object):
             self.actions.update(self.currentBid - self.lastBid, oppementUtilty - self.oppementUtilty)
         self.oppementUtilty = oppementUtilty
 
+    def getLastAction(self) -> str:
+        return self.actions.getLastAction()
+
     def getUtilty(self, bid: str) -> float:
         """
         Calculates the value of a single bid.

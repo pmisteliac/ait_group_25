@@ -36,6 +36,7 @@ for root, dirs, files in os.walk(src, topdown=True):
             markov.update(name, agent1.actions, agent2.actions)
 
 print(markov)
+markov.startChecking()
 
 for root, dirs, files in os.walk(src, topdown=True):
     for name in files:
@@ -48,10 +49,12 @@ for root, dirs, files in os.walk(src, topdown=True):
                 if 'agent1' in bid:
                     agent1.processBid(bid['agent1'])
                     agent1.updateAction(agent2.getUtilty(bid['agent1']))
+                    markov.updateChances(agent1.getLastAction())
                 if 'agent2' in bid:
                     agent2.processBid(bid['agent2'])
                     agent2.updateAction(agent1.getUtilty(bid['agent2']))
                 if 'accept' in bid:
                     for i in markov.getChances(agent1.actions, agent2.actions):
                         print('AAA: ', *i, i.get(*i))
+                    print(markov)
                     break

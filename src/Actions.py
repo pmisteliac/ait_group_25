@@ -5,6 +5,7 @@ class Actions(object):
     unfortunated = 0
     fortunated = 0
     silent = 0
+    lastAction = ''
 
     delta = 0.001
 
@@ -25,23 +26,44 @@ class Actions(object):
         :return:
         """
 
+        action = self.getAction(currentAgentDelta, oppenementDelta)
+        setattr(self, action, getattr(self, action) + 1)
+        self.lastAction = action
+
+    def getAction(self, currentAgentDelta: float, oppenementDelta: float) -> str:
+        """
+                Several actions can be taken by the agents:
+                    - Silent: Changes to the utilty are with in the abs(delta) < self.delta
+
+                    - Nice: Own utilty increase oppement doesn't change.
+                    - Fortunated: Own utilty increases and the oppement one too.
+                    - Selfish: Own utilty increases and opppement decreases.
+
+                    - Conceding: Own utilty decreases and the oppement one improves.
+                    - Unfortunated: Own utilty decreases and the oppenemt one too.
+
+                :param float currentAgentDelta:
+                :param float oppenementDelta:
+                :return string: name of action
+                """
+
         if abs(currentAgentDelta) < self.delta and abs(oppenementDelta) < self.delta:
-            self.silent += 1
-            return
+            return 'silent'
 
         if currentAgentDelta >= 0:
             if oppenementDelta > self.delta:
-                self.fortunated += 1
+                return 'fortunated'
             elif abs(oppenementDelta) < self.delta:
-                self.nice += 1
+                return 'nice'
             else:
-                self.selfish += 1
-            return
+                return 'selfish'
 
         if oppenementDelta < 0:
-            self.unfortunated += 1
-        else:
-            self.conceded += 1
+            return 'unfortunated'
+        return 'conceded'
+
+    def getLastAction(self) -> str:
+        return self.lastAction
 
     def __str__(self):
         return ''.join(map(lambda x: '{0} = {1}, '.format(*x), self)).rstrip(', ') + '\n'

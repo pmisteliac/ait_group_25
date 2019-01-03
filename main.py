@@ -1,20 +1,26 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.7
 
 import json
 import sys
 import os
 
+if sys.version_info[0] == 3 and sys.version_info[1] < 7:
+    print("This script requires at least Python version 3.7")
+    sys.exit(1)
+
 from src.Agent import Agent
 from src.Markov import Markov
 
-if len(sys.argv) == 2:
+if len(sys.argv) == 3:
     src = str(sys.argv[1])
+    testDir = str(sys.argv[2])
 else:
     src = 'data'
+    testDir = 'test'
 
 markov = Markov()
 
-for root, dirs, files in os.walk(src, topdown=True):
+for _, _, files in os.walk(src, topdown=True):
     for name in files:
         print('running:', name)
         with open(os.path.join(src, name)) as file:
@@ -38,10 +44,10 @@ for root, dirs, files in os.walk(src, topdown=True):
 print(markov)
 markov.startChecking()
 
-for root, dirs, files in os.walk(src, topdown=True):
+for _, _, files in os.walk(testDir, topdown=True):
     for name in files:
         print('running:', name)
-        with open(os.path.join(src, name)) as file:
+        with open(os.path.join(testDir, name)) as file:
             run = json.load(file)
             agent1 = Agent(list(run['issues'].keys()), run['Utility1'])
             agent2 = Agent(list(run['issues'].keys()), run['Utility2'])

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from functools import reduce
 
 import copy
@@ -31,6 +32,8 @@ class Markov(object):
         if action != '':
             for i in map(lambda type: {type: self.evidence[type] + self.data[type].getEff(action)}, self.data):
                 self.evidence[[*i][0]] = i.get(*i)
+            for i in self.evidence:
+                self.evidence[i] = self.evidence[i] / sum(self.evidence.values())
 
 
     def getChances(self, actionAgent: Actions, actionOppement: Actions):
@@ -42,24 +45,25 @@ class Markov(object):
             .join(map(lambda x: "{0}: {1}\n".format(x, self.evidence[x]), self.evidence))
 
 
+# noinspection PyUnresolvedReferences
+#- well I just want Python 4.
 class Data(object):
 
     def __init__(self, action: Actions):
         for i in action:
             setattr(self, *i)
 
-    def __iadd__(self, other) -> object:
+    def __iadd__(self, other) -> Data:
         return self.calc(other, operator.add)
 
     def getEff(self, action: str) -> float:
         """
-        TODO this method must return correct chances for each type.
         :param string action: Action taken by the agent.
-        :return:
+        :return float:
         """
         return getattr(self, action) / Data.getCount(self)
 
-    def getChance(self, action: Actions) -> object:
+    def getChance(self, action: Actions) -> Data:
         """
         TODO this method must return chances for each type.
         :param Actions action: List of taken actions by the agent.
@@ -80,16 +84,16 @@ class Data(object):
     def __truediv__(self, other) -> object:
         return self.save(map(lambda o: {o[0][0]: 0 if o[1][1] == 0 else o[0][1] / o[1][1]}, zip(self, other)))
 
-    def __mul__(self, other) -> object:
+    def __mul__(self, other) -> Data:
         return self.calc(other, operator.mul)
 
-    def calc(self, other, operator) -> object:
+    def calc(self, other, operator) -> Data:
         if isinstance(other, float) or isinstance(other, int):
             return self.save(map(lambda x: {x[0]: operator(x[1], other)}, self))
         else:
             return self.save(map(lambda o: {o[0][0]: operator(o[0][1], o[1][1])}, zip(self, other)))
 
-    def save(self, itter) -> object:
+    def save(self, itter) -> Data:
         for i in list(itter):
             setattr(self, *i, i.get(*i))
         return self

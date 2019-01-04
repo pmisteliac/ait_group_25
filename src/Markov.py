@@ -54,8 +54,6 @@ class Markov(object):
               rCount += 1
             elif 'H' == i[0][0]:
                 hCount += 1
-            # elif 'T' == i[0][0]:
-            #     tCount += 1
             else:
                 cCount += 1
 

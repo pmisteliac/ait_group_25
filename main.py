@@ -60,7 +60,7 @@ for _, _, files in os.walk(testDir, topdown=True):
                     agent2.processBid(bid['agent2'])
                     agent2.updateAction(agent1.getUtilty(bid['agent2']))
                 if 'accept' in bid:
-                    for i in markov.getChances(agent1.actions, agent2.actions):
-                        print('AAA: ', *i, i.get(*i))
+                    # for i in markov.getChances(agent1.actions, agent2.actions):
+                    #     print('AAA: ', *i, i.get(*i))
                     print(markov)
                     break

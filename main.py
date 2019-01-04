@@ -57,13 +57,15 @@ for _, _, files in os.walk(src, topdown=True):
 
             markov.update(name, agent1.actions, agent2.actions)
 
+
+
 markov.startChecking()
 
 for _, _, files in os.walk(testDir, topdown=True):
     for name in files:
         with open(os.path.join(testDir, name)) as file:
             run = json.load(file)
-            print('running: {0} len {1}'.format(name, len(run.get('bids'))))
+            print('1 running: {0} len {1}'.format(name, len(run.get('bids'))))
             agent1 = Agent(list(run['issues'].keys()), run['Utility1'])
             agent2 = Agent(list(run['issues'].keys()), run['Utility2'])
             for bid in run['bids']:
@@ -76,6 +78,55 @@ for _, _, files in os.walk(testDir, topdown=True):
                 if 'agent2' in bid:
                     agent2.processBid(bid['agent2'])
                     agent2.updateAction(agent1.getUtilty(bid['agent2']))
+                if 'accept' in bid:
+                    break
+            print(markov.evidence)
+            print(markov.getMostLikely())
+
+for _, _, files in os.walk(src, topdown=True):
+    for name in files:
+        print('running:', name)
+        with open(os.path.join(src, name)) as file:
+            run = json.load(file)
+            if len(run.get('bids')) < 6:
+                continue
+            agent1 = Agent(list(run['issues'].keys()), run['Utility1'])
+            agent2 = Agent(list(run['issues'].keys()), run['Utility2'])
+            for bid in run['bids']:
+                if int(bid['round']) > 100:
+                    break
+                if 'agent2' in bid:
+                    agent1.processBid(bid['agent2'])
+                    agent1.updateAction(agent2.getUtilty(bid['agent2']))
+                if 'agent1' in bid:
+                    agent2.processBid(bid['agent1'])
+                    agent2.updateAction(agent1.getUtilty(bid['agent1']))
+                if 'accept' in bid:
+                    break
+
+            n = str(name.split('.')[0]).split('_')
+            print('{0}_{1}'.format(n[1], n[0]))
+            markov.update('{0}_{1}'.format(n[1], n[0]), agent1.actions, agent2.actions)
+
+markov.startChecking()
+
+for _, _, files in os.walk(testDir, topdown=True):
+    for name in files:
+        with open(os.path.join(testDir, name)) as file:
+            run = json.load(file)
+            print('2 running: {0} len {1}'.format(name, len(run.get('bids'))))
+            agent1 = Agent(list(run['issues'].keys()), run['Utility1'])
+            agent2 = Agent(list(run['issues'].keys()), run['Utility2'])
+            for bid in run['bids']:
+                if int(bid['round']) > 100:
+                    break
+                if 'agent2' in bid:
+                    agent1.processBid(bid['agent2'])
+                    agent1.updateAction(agent2.getUtilty(bid['agent2']))
+                    markov.updateChances(agent1.getLastAction())
+                if 'agent1' in bid:
+                    agent2.processBid(bid['agent1'])
+                    agent2.updateAction(agent1.getUtilty(bid['agent1']))
                 if 'accept' in bid:
                     break
             print(markov.evidence)

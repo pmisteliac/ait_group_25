@@ -40,19 +40,22 @@ class Markov(object):
             .join(str(self.evidence))
 
     def getMostLikely(self):
-        random = 0.25
+        random = 0.125
 
-        t = {'random': 0, 'hardheaded': 0, 'conceder': 0}
+        t = {'random': 0, 'hardheaded': 0, 'conceder': 0, 'tft': 0}
 
         rCount = 0
         cCount = 0
         hCount = 0
+        tCount = 0
 
         for i in self.evidence:
             if 'R' == i[0][0]:
               rCount += 1
             elif 'H' == i[0][0]:
                 hCount += 1
+            # elif 'T' == i[0][0]:
+            #     tCount += 1
             else:
                 cCount += 1
 
@@ -75,16 +78,36 @@ class Markov(object):
             elif 'R' == i[0][0]:
                 if 0.0001 < i[1] < random:
                     t['conceder'] += 0.2
+        for i in self.evidence:
+            if 'T' == i[0][0]:
+                if i[1] > 0.07:
+                    t['tft'] += i[1]
+                    tCount += 1
+            # elif 'R' == i[0][0]:
+            #     if 0.0001 < i[1] < random:
+            #         t['conceder'] += 0.2
 
 
         t['random'] *= 4
         t['hardheaded'] *= 6
         t['conceder'] *= 10
 
-        if 0.4 < (t['random']):
+        if tCount == 2:
+            t['tft'] *= 40
+        else:
+            t['tft'] *= 2
+
+        print(t)
+
+        if 0.1 < (t['random']):
             return 'random'
         if t['hardheaded'] > t['conceder']:
-            return 'hardheaded'
+            if t['tft'] < t['hardheaded']:
+                return 'hardheaded'
+            return 'tft'
+
+        if t['tft'] > t['conceder']:
+            return  'tft'
 
         return 'conceder'
 

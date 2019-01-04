@@ -7,7 +7,7 @@ class Actions(object):
     silent = 0
     lastAction = ''
 
-    delta = 0.001
+    delta = 0.01
 
     def update(self, currentAgentDelta: float, oppenementDelta: float) -> None:
         """

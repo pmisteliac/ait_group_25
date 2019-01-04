@@ -7,7 +7,6 @@ import operator
 from src.Actions import Actions
 from inflection import camelize
 
-
 class Markov(object):
     data = {}
     evidence = {}
@@ -40,10 +39,54 @@ class Markov(object):
         return ''\
             .join(str(self.evidence))
 
-    # def __str__(self):
-    #     return ''\
-    #         .join(map(lambda x: "{0}: {1}\n".format(x, self.data[x]), self.data))\
-    #         .join(str(self.evidence))
+    def getMostLikely(self):
+        random = 0.25
+
+        t = {'random': 0, 'hardheaded': 0, 'conceder': 0}
+
+        rCount = 0
+        cCount = 0
+        hCount = 0
+
+        for i in self.evidence:
+            if 'R' == i[0][0]:
+              rCount += 1
+            elif 'H' == i[0][0]:
+                hCount += 1
+            else:
+                cCount += 1
+
+        for i in self.evidence:
+            if 'R' == i[0][0]:
+                if i[1] > random:
+                    t['random'] += i[1] / rCount
+        for i in self.evidence:
+            if 'H' == i[0][0]:
+                t['hardheaded'] += i[1] / hCount
+            elif 'R' == i[0][0]:
+                if i[1] < 0.0001:
+                    t['hardheaded'] += 0.2
+                if i[1] < 10**-30:
+                    t['hardheaded'] += 0.2
+        for i in self.evidence:
+            "Conceder looks more like random than the hardheaded"
+            if 'C' == i[0][0]:
+                t['conceder'] += i[1] / cCount
+            elif 'R' == i[0][0]:
+                if 0.0001 < i[1] < random:
+                    t['conceder'] += 0.2
+
+
+        t['random'] *= 4
+        t['hardheaded'] *= 6
+        t['conceder'] *= 10
+
+        if 0.4 < (t['random']):
+            return 'random'
+        if t['hardheaded'] > t['conceder']:
+            return 'hardheaded'
+
+        return 'conceder'
 
 # noinspection PyUnresolvedReferences
 #- well I just want Python 4.
@@ -64,6 +107,9 @@ class Math(object):
 
     def __mul__(self, other) -> Math:
         return self.calc(other, operator.mul)
+
+    def __pow__(self, power, modulo=None) -> Math:
+        return self.calc(operator, operator.pow)
 
     def calc(self, other, operator) -> Math:
         if isinstance(other, float) or isinstance(other, int):
@@ -109,7 +155,6 @@ class Data(Math):
 
     def getChance(self, action: Actions) -> Data:
         """
-        TODO this method must return chances for each type.
         :param Actions action: List of taken actions by the agent.
         :return self:
         """

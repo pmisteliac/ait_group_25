@@ -44,6 +44,8 @@ for _, _, files in os.walk(src, topdown=True):
             agent1 = Agent(list(run['issues'].keys()), run['Utility1'])
             agent2 = Agent(list(run['issues'].keys()), run['Utility2'])
             for bid in run['bids']:
+                if int(bid['round']) > 100:
+                    break
                 if 'agent1' in bid:
                     agent1.processBid(bid['agent1'])
                     agent1.updateAction(agent2.getUtilty(bid['agent1']))
@@ -53,11 +55,8 @@ for _, _, files in os.walk(src, topdown=True):
                 if 'accept' in bid:
                     break
 
-            print(str(agent1.actions))
-            print(str(agent2.actions))
             markov.update(name, agent1.actions, agent2.actions)
 
-print(markov)
 markov.startChecking()
 
 for _, _, files in os.walk(testDir, topdown=True):
@@ -68,6 +67,8 @@ for _, _, files in os.walk(testDir, topdown=True):
             agent1 = Agent(list(run['issues'].keys()), run['Utility1'])
             agent2 = Agent(list(run['issues'].keys()), run['Utility2'])
             for bid in run['bids']:
+                if int(bid['round']) > 100:
+                    break
                 if 'agent1' in bid:
                     agent1.processBid(bid['agent1'])
                     agent1.updateAction(agent2.getUtilty(bid['agent1']))
@@ -76,7 +77,5 @@ for _, _, files in os.walk(testDir, topdown=True):
                     agent2.processBid(bid['agent2'])
                     agent2.updateAction(agent1.getUtilty(bid['agent2']))
                 if 'accept' in bid:
-                    # for i in markov.getChances(agent1.actions, agent2.actions):
-                    #     print('AAA: ', *i, i.get(*i))
-                    print(markov)
                     break
+            print(markov.getMostLikely())

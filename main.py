@@ -78,4 +78,5 @@ for _, _, files in os.walk(testDir, topdown=True):
                     agent2.updateAction(agent1.getUtilty(bid['agent2']))
                 if 'accept' in bid:
                     break
+            print(markov.evidence)
             print(markov.getMostLikely())

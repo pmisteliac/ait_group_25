@@ -39,7 +39,7 @@ class Markov(object):
         return ''\
             .join(str(self.evidence))
 
-    def getMostLikely(self):
+    def getMostLikely(self) -> str:
         random = 0.125
 
         t = {'random': 0, 'hardheaded': 0, 'conceder': 0, 'tft': 0}
@@ -57,6 +57,7 @@ class Markov(object):
             else:
                 cCount += 1
 
+        """Sum chances"""
         for i in self.evidence:
             if 'R' == i[0][0]:
                 if i[1] > random:
@@ -78,10 +79,11 @@ class Markov(object):
                     t['conceder'] += 0.2
         for i in self.evidence:
             if 'T' == i[0][0]:
+                t['tft'] += i[1]
                 if i[1] > 0.07:
-                    t['tft'] += i[1]
                     tCount += 1
 
+        """Normalize"""
         t['random'] *= 4
         t['hardheaded'] *= 6
         t['conceder'] *= 10
@@ -93,7 +95,8 @@ class Markov(object):
 
         print(t)
 
-        if 0.1 < (t['random']):
+        """Return most logical"""
+        if t['random'] > random:
             return 'random'
         if t['hardheaded'] > t['conceder']:
             if t['tft'] < t['hardheaded']:

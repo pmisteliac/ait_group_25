@@ -81,10 +81,6 @@ class Markov(object):
                 if i[1] > 0.07:
                     t['tft'] += i[1]
                     tCount += 1
-            # elif 'R' == i[0][0]:
-            #     if 0.0001 < i[1] < random:
-            #         t['conceder'] += 0.2
-
 
         t['random'] *= 4
         t['hardheaded'] *= 6
